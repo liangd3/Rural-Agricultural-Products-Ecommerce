@@ -1,0 +1,174 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Order Detail
+{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+  <div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="{{ url_for('customer.customer_orders') }}">My Orders</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <section class="section"> 
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="form-main">
+            <div class="title">
+              <h5 class="card-title">Order Details</h5>
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Order Id:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_id }}</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Order Status:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_status }}</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md_4 label"><strong>Shipping Method:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.shipping_name }}:  ${{ order.shipping_price }}</div>
+              </div>
+              {% if order.shipping_name  != 'Pick-up'%}
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Shipping Address:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.shipping_address }}</div>
+              </div>
+              {% endif %}
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Order Date:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_date|nzdate }}</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Order Total:</strong></div>
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ order.total_amount }}</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label"><strong>Payment:</strong></div>
+                {% if payment %}
+                <div class="col-lg-9 col-md-8 text-capitalize">{{ payment.payment_type_name }}  Amount: $ {{ payment.payment_amount }} on {{ payment.payment_date_time |nzdatetime }}</div>
+             
+                {% else %}
+                <div class="col-lg-9 col-md-8 text-capitalize" style="color: red;">Not paid yet.</div>
+                {% endif %}
+              </div>
+            </div>
+            <br>
+            <div class="table-responsive">
+              <table class="table table-hover datatable">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Discount Rate</th>
+                    <th>Final Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for l in lines %}
+                  <tr>
+                    <td>
+                      {% if l.product_image %}
+                      <img src="/blueprints/static/product_image/{{ l.product_image }}" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                      {% else %}
+                      <img src="/blueprints/static/product_image/default-image.jpg" alt="Product" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                      {% endif %}
+                      {{l.product_name}}
+                    </td>
+                    <td>{{ l.quantity }}</td>
+                    <td>{{ l.unit_price }}</td>
+                    {% if l.discount_rate  %}
+                    {% set discount = l.discount_rate|float * 100 %}
+                        {{discount|int}}% off
+                    <td>{{discount|int}}% off</td>
+                    {%else%}
+                    <td>Not Applicable</td>
+                    {% endif %}
+
+                    <td>{{ l.final_unit_price }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <br>
+            <button class="btn btn-danger" data-toggle="modal" data-target="#cancelModal" {% if order.order_status == "cancelled" %}disabled{% endif %} onclick="cancelOrder()">Cancel</button>
+            <!-- Modal for cancel confirmation -->
+            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <h5 class="modal-title w-100 text-center" id="cancelModalLabel">Request to Cancel Order</h5>
+                      <form action="{{ url_for('customer.send_messages_to_lv1') }}" method="post" class="d-flex flex-wrap justify-content-between align-items-center p-3">
+                        <input type="hidden" value="{{ order.order_id }}" name="order_id" id="order_id">
+                        <input type="hidden" value="Cancel Order Request" name="message_subject" id="message_subject">
+                          <div class="form-group flex-grow-1 mb-2">
+                              <label for="message_content" class="w-100">Reason for cancellation:</label>
+                          </div>
+                          <div class="form-group flex-grow-1 mb-2">
+                              <select class="form-control w-100" id="message_content" name="message_content">
+                                  <option value="Out of stock">Out of stock</option>
+                                  <option value="Customer changed mind">Changed mind</option>
+                                  <option value="Delivery delay">Delivery delay</option>
+                                  <option value="Other">Other</option>
+                              </select>
+                          </div>
+                          <button class="btn btn-danger mx-2">Send Request</button>
+                          <button type="button" class="btn btn-secondary mx-2" data-dismiss="modal" onclick="hideCancelModal()">Close</button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+          
+          
+            {% if not payment or payment.payment_type_name == 'Account Balance'%}
+          <div style="float: right;">
+            <a href="{{ url_for('customer.customer_pay_order', id = order.order_id) }}" class="btn btn-primary" style="color: white;">Pay Now</a>
+          </div>
+          {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+
+
+<script>
+
+
+function showCancelModal() {
+    // Show the cancel modal
+    $('#cancelModal').modal('show');
+}
+
+function hideCancelModal() {
+    // Show the cancel modal
+    $('#cancelModal').modal('hide');
+}
+
+
+
+
+function cancelOrder() {
+    // Show the cancel modal when the cancel button is clicked
+    showCancelModal();
+}
+
+
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <nav>
+          <ol class="breadcrumb">
+            {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+            <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{url_for('internal.get_application_messages')}}">Account Holder Application List</a></li>
+            {% for cus_message in cus_messages %}
+            <li class="breadcrumb-item active">{{cus_message.message_id}}</li>
+            {% endfor %}
+          </ol>
+        </nav>
+      </div><!-- End Page Title -->
+
+    <section class="section contact">
+
+        <div class="row gy-4">
+            <div class="col-xl-6">
+                        <div class="info-box card">
+                            {% for cus_message in cus_messages %}
+                            <div class="message-item">                                
+                                <i class="bi bi-envelope"></i>
+                                <table>
+                                    <tr>
+                                        <th style="padding-left: 1%;">From {{ cus_message.first_name }} {{ cus_message.last_name }} (ID: {{ cus_message.user_id }}) </th>
+                                    </tr>
+                                    <br>
+                                    <tr>
+                                        <br>
+                                        <td>
+                                            <textarea class="form-control" rows="6" cols="70" style="padding-left: 1%;" readonly>{{ cus_message.message_content }}</textarea>
+                                        </td>
+                                    </tr>
+                                    <h5 style="font-weight: bold; padding-left: 1%;">{{cus_message.message_subject}} ({{ cus_message.message_timestamp|nzdatetime }})</h5>
+                                </table>
+                            </div>
+                            {% endfor %}
+                        </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="card p-4">
+                    {% for cus_message in cus_messages %}
+                <form method="post" onsubmit="return validateForm()">
+                    <input type="hidden" id="message_status" name="message_status" value="{{ cus_message.message_status }}">
+                    
+                    <div class="row gy-4">
+
+                    <div class="col-md-12">
+                        <p style="font-weight: bold; padding-left: 1%;">Your Response:</p>
+                        <br>
+                        <textarea class="form-control" name="message_content" rows="6" placeholder="Message" id="message_content" required></textarea>
+                    </div>
+
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary" formaction="{{url_for('internal.approve_application_messages', message_id=cus_message.message_id)}}">Approve</button>
+                        <button type="submit" class="btn btn-danger"  formaction="{{url_for('internal.respond_application_messages', message_id=cus_message.message_id)}}">Decline</button>
+                    </div>
+
+                    </div>
+                </form>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function validateForm() {
+        var messageStatus = document.getElementById("message_status").value;
+        if (messageStatus == 0) {
+            alert("You cannot respond to this message because it has been replied!");
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,442 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+	<!-- Breadcrumbs -->
+	<div class="breadcrumbs">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="bread-inner">
+						<ul class="bread-list">
+							<li><a href="/">Home<i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a href="{{url_for('customer.checkout')}}">Checkout</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Breadcrumbs -->
+			
+	<!-- Start Checkout -->
+	<section class="shop checkout section">
+		<div class="container">
+			<form method="POST" action="{{url_for('customer.checkout')}}">
+				{% if pickup %}
+				<input name="pickup" id="pickup-box" type="checkbox" onchange="this.form.submit()" checked/>
+				{% elif calculation.mustPickup %}
+				<input name="pickup" id="pickup-box" type="checkbox" onchange="this.form.submit()" checked disabled="disabled"/>
+				{% else %}
+				<input name="pickup" id="pickup-box" type="checkbox" onchange="this.form.submit()" />
+				{% endif %}
+				<label class="checkbox-inline" for="pickup-box">Pickup in store</label>
+			</form>
+
+			<form method="POST" id="checkout-form" action="{{url_for('customer.payment', action = "payment")}}">
+				{% if pickup or calculation.mustPickup%}
+				<input hidden name="pickup" type="checkbox" checked/>
+				{% else %}
+				<input hidden name="pickup" type="checkbox" />
+				{% endif %}
+
+			<div class="row"> 
+				{% if not pickup %}
+				<div id="form-section" class="col-lg-8 col-12">
+					<div class="checkout-form" id="address-input-card">
+						<h2 id="delivery-title">Delivery Address</h2>
+						<!-- Form -->
+							<div>
+								<label>Select a saved address</label>
+								<select name="saved-address" id="saved-address" onchange="savedAddress()">
+									<option value="default" selected>Select an address from below...</option>
+									{% for address in addresses %}
+									<option value="{{address.address_id}}">{{address.full_address}}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="row" >
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>First Name<span>*</span></label>
+										<input type="text" name="first_name" id="first_name" placeholder="" required="required" value="{{customer.first_name}}">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Last Name<span>*</span></label>
+										<input type="text" name="last_name" id="last_name" placeholder="" required="required" value="{{customer.last_name}}">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Email Address<span>*</span></label>
+										<input type="email" name="email" id="email" placeholder="" required="required" value="{{customer.email_address}}">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Phone Number<span>*</span></label>
+										<input type="number" name="phone" id="phone" placeholder="" required="required" value="{{customer.phone}}">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Country</label>
+										<select name="country_name" id="country">
+											<option value="NZ">New Zealand</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>State / Divition<span>*</span></label>
+										<select name="region" id="region" required onchange="addressEdited(); checkOuterIsland('${{calculation.shipping | numberFormat}}');)">
+											<option value="Northland">Northland</option>
+											<option value="Auckland">Auckland</option>
+											<option value="Waikato">Waikato</option>
+											<option value="Bay-of-Plenty">Bay of Plenty</option>
+											<option value="Gisborne">Gisborne</option>
+											<option value="Hawkes-Bay">Hawke's Bay</option>
+											<option value="Taranaki">Taranaki</option>
+											<option value="Manawatu-Wanganui">Manawatū-Whanganui</option>
+											<option value="Wellington">Wellington</option>
+											<option value="Tasman">Tasman</option>
+											<option value="Nelson">Nelson</option>
+											<option value="Marlborough">Marlborough</option>
+											<option value="West-Coast">West Coast</option>
+											<option value="Canterbury">Canterbury</option>
+											<option value="Otago">Otago</option>
+											<option value="Southland">Southland</option>
+											<option value="Outer-Islands">Outer Islands</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Unit</label>
+										<input type="text" name="unit" id="unit" placeholder="" onchange="addressEdited()">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Address Line 1<span>*</span></label>
+										<input type="text" name="address1" id="address1" placeholder="" required onchange="addressEdited()">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Address Line 2</label>
+										<input type="text" name="address2" id="address2" placeholder="" onchange="addressEdited()">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>City<span>*</span></label>
+										<input type="text" name="city" id="city" placeholder="" required onchange="addressEdited()">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Postal Code<span>*</span></label>
+										<input type="text" name="postcode" id="postcode" placeholder="" required onchange="addressEdited()">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label class="checkbox-inline" for="saveThisAddress">
+											<input name="saveThisAddress" id="saveThisAddress" type="checkbox" onchange="addressEdited()">
+											 Save this address?
+										</label>
+									</div>
+								</div>
+								
+							</div>
+						<!--/ End Form -->
+					</div>
+				</div>
+			
+			
+				
+				<!--Payment form-->
+				<div id="payment-section"  class="col-lg-8 col-12" hidden>
+					<div id="payment-required-card">
+						<h5>Please select a payment</h5>
+					</div>
+					<div id="payment-details">
+						<h2>Payment Detail</h2>
+						<div class="card row card p-4 mt-4 mb-4">
+							<div class="col-lg-9 col-md-9 col-12">
+								<div class="form-group">
+									<label>Card Number</label>
+									<input type="tel" name="card_number" id="card-number" 
+									inputmode="numeric" pattern="[0-9\s]{15,19}" 
+									autocomplete="cc-number" maxlength="19" 
+									placeholder="xxxx xxxx xxxx xxxx" required>
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-3 col-12">
+								<div class="form-group">
+									<label>CVV Number</label>
+									<input type="number" name="card_cvv" id="card-cvv" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{15,19}"
+									maxlength="4" placeholder="xxx" required>
+								</div>
+							</div>
+							<div class="col-lg-2 col-md-2 col-12">
+								<div class="form-group">
+									<label>Expiry Date</label>
+									<input type="number" name="card_month" id="card-month" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+									maxlength="2" min="0" max="12" maplaceholder="MM" required>
+									<span>/</span>
+									<input type="number" name="card_year" id="card-year" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+									maxlength="2" min=24" max="99" maplaceholder="YY" required>
+								</div>
+							</div>
+							<div class="col-lg-2 col-md-2 col-12">
+								<div class="form-group">
+									<label>Name</label>
+									<input type="text" name="card_name" id="card-name" required>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% else %}
+				<div id="payment-section" class="col-lg-8 col-12" >
+					<div id="payment-required-card" class="mt-3">
+						<h5>Please select a payment</h5>
+					</div>
+					<div id="payment-details" style="display:none;">
+						<h2>Payment Detail</h2>
+						<div class="card row card p-4 mt-4 mb-4">
+							<div class="col-lg-9 col-md-9 col-12">
+								<div class="form-group">
+									<label>Card Number</label>
+									<input type="tel" name="card_number" id="card-number" 
+									inputmode="numeric" pattern="[0-9\s]{15,19}" 
+									autocomplete="cc-number" maxlength="19" 
+									placeholder="xxxx xxxx xxxx xxxx" required>
+								</div>
+							</div>
+							<div class="col-lg-3 col-md-3 col-12">
+								<div class="form-group">
+									<label>CVV Number</label>
+									<input type="number" name="card_cvv" id="card-cvv" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{15,19}"
+									maxlength="4" placeholder="xxx" required>
+								</div>
+							</div>
+							<div class="col-lg-2 col-md-2 col-12">
+								<div class="form-group">
+									<label>Expiry Date</label>
+									<input type="number" name="card_month" id="card-month" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+									maxlength="2" min="0" max="12" maplaceholder="MM" required>
+									<span>/</span>
+									<input type="number" name="card_year" id="card-year" 
+									type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+									maxlength="2" min=24" max="99" maplaceholder="YY" required>
+								</div>
+							</div>
+							<div class="col-lg-2 col-md-2 col-12">
+								<div class="form-group">
+									<label>Name</label>
+									<input type="text" name="card_name" id="card-name" required>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{% endif %}
+				<div id="placeholder" class="col-lg-8 col-12" style="display:none;" ></div>
+
+				<!--End Payment form-->
+				<div class="col-lg-4 col-12">
+					<div class="order-details">
+						<!-- Order Widget -->
+						<div class="single-widget">
+							<h2>CART TOTALS</h2>
+							<div class="content">
+								<ul>
+									<li>GST<span id="gst">${{calculation.gst | numberFormat}}</span></li>
+									<li>Subtotal (Excl. GST)<span id="subtotal">${{calculation.totalExShippingExGst | numberFormat}}</span></li>
+									<li>(+) Shipping<span id="shipping">${{calculation.shipping | numberFormat}}</span></li>
+									<li id="summary-coupon"></li>
+									<li class="last">Total<span id="total-cost">${{calculation.total | numberFormat}}</span><span id="total-cost-tbd" hidden>TBD</span></li>
+									<input type="number" id="calculated_total" name="calculated_total" value="{{calculation.total}}" hidden />
+								</ul>
+							</div>
+						</div>
+						<!--/ End Order Widget -->
+						<!-- Gift Card Widget -->
+						<div class="single-widget">
+							<h2>Gift Card</h2>
+							<div class="content">
+								<ul>
+									<li>
+									{% if giftcards %}
+
+
+									{% for card in giftcards %}
+									<input type="checkbox" class="giftcard-checkbox" id="giftcard{{card.gift_card_id}}" name="giftcard{{card.gift_card_id}}" value="{{card.gift_card_amount}}">
+									<label for="giftcard{{card.gift_card_id}}"> {{card.gift_card_number}}: ${{card.gift_card_amount}}</label><br>
+							
+									{% endfor %}
+									{% else %}
+									<div>You have no bound giftcard yet.</div>
+
+									{% endif %}
+									</li>
+								</ul>
+
+							</div>
+							<div class="single-widget get-button">
+								<div class="button">
+									<button type="button" id="apply-giftcard-button" class="btn">Apply Giftcard</button>
+								</div>
+							</div>
+						</div>
+						<!--/ End Gift Card Widget -->
+						<!-- Order Widget -->
+						<div class="single-widget" id="card-card">
+							<h2>Payments</h2>
+							<div class="content">
+
+								<ul>
+									<li><label class="checkbox-inline" for="card"><input name="payment-method" id="card" value="card" type="radio" required> Credit/Debit Card</label></li>
+
+									<li>
+									{% if calculation.remainingLimit < calculation.total %}
+									<label class="checkbox-inline .text-white-50" for="account"><input name="payment-method" id="account" value="account" type="radio" disabled > On Account <br>(Remaining Limit: ${{calculation.remainingLimit | numberFormat}})</label>
+									{% else %}
+									<label class="checkbox-inline" for="account"><input name="payment-method" id="account" value="account" type="radio" > On Account <br>(Remaining Limit: ${{calculation.remainingLimit | numberFormat}})</label>
+									{% endif %}
+									</li>
+									<li>
+									{% if pickup %}
+									<label class="checkbox-inline" for="cash"><input name="payment-method" id="cash" value="cash" type="radio" > Cash/Eftpos In-Store</label>
+									{% else %}
+									<label class="checkbox-inline .text-white-50" for="cash"><input name="payment-method" id="cash" value="cash" type="radio" disabled > Cash/Eftpos In-Store</label>
+									{% endif %}
+									</li>
+								</ul>
+								<ul>
+									<li id="coupon-method"></li>
+								</ul>
+							</div>
+						</div>
+						<!--/ End Order Widget -->
+						<!-- Payment Method Widget -->
+						<div class="single-widget payement">
+							<div class="content">
+								<img src="{{ url_for('static', filename='customer/images/payment-method.png') }}" alt="#">
+							</div>
+						</div>
+						<!--/ End Payment Method Widget -->
+						<!-- Button Widget -->
+						<div class="single-widget get-button">
+							<div class="content">
+								<div class="button">
+									{% if not pickup %}
+									<a id="next-button" class="btn" onclick="proceedToPayment()">Next: Payment Detail</a>
+									<button type="submit" id="submit-button" class="btn" hidden>Checkout</button>
+									{% else %}
+									<button type="submit" id="submit-button-pickup" class="btn" >Checkout</button>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<!--/ End Button Widget -->
+					</div>
+				</div>
+
+			</div>
+			</form>
+		</div>
+		
+	</section>
+	<!--/ End Checkout -->
+	
+	<!-- Start Shop Services Area  -->
+	<section class="shop-services section home">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-rocket"></i>
+						<h4>Free shiping</h4>
+						<p>Orders over $100</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-reload"></i>
+						<h4>Free Return</h4>
+						<p>Within 30 days returns</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-lock"></i>
+						<h4>Sucure Payment</h4>
+						<p>100% secure payment</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-tag"></i>
+						<h4>Best Peice</h4>
+						<p>Guaranteed price</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Services -->
+	
+	<!-- Start Shop Newsletter  -->
+	<section class="shop-newsletter section">
+		<div class="container">
+			<div class="inner-top">
+				<div class="row">
+					<div class="col-lg-8 offset-lg-2 col-12">
+						<!-- Start Newsletter Inner -->
+						<div class="inner">
+							<h4>Newsletter</h4>
+							<p> Subscribe to our newsletter and get <span>10%</span> off your first purchase</p>
+							<form action="mail/mail.php" method="get" target="_blank" class="newsletter-inner">
+								<input name="EMAIL" placeholder="Your email address" required="" type="email">
+								<button class="btn">Subscribe</button>
+							</form>
+						</div>
+						<!-- End Newsletter Inner -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Newsletter -->
+	
+
+
+	{% block js %} 
+	<!-- Fancybox JS -->
+	<script src="{{ url_for('static', filename='customer/js/facnybox.min.js') }}"></script>
+	<!-- Ytplayer JS -->
+	<script src="{{ url_for('static', filename='customer/js/ytplayer.min.js') }}"></script>
+
+	{% endblock%}
+	
+{% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends 'customer/customer_layout.html' %}
+
+{% block title %}Moa Creek Rural Supplies - Rewards Details{% endblock %}
+
+{% block content %}
+  
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active">Reward Points</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="rewards" class="rewards section">
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <div class="form-main">
+                    <div class="title">
+                        <h4>Reward Points</h4>
+                        <div class="box">
+                            <p>Earn 1 Rewards Point For Every $1 NZD Spent</p>
+                            {% for r in reward_points %}
+                            <div class="reward-info">
+                                <div class ="box">
+                                    <p><strong>{{r.level_point}}</strong> points = <strong> ${{r.gift_card_amount}} </strong>voucher</p>
+                                    <form method="POST" action="{{ url_for('customer.checkRewards') }}">
+                                        <input type="hidden" name="point" value="{{r.level_point}}">
+                                        <button type="submit" class="btn btn-secondary pull-right" {% if r.level_point > current_point %} disabled {% endif %}>Redeem</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="points-balance">My Points Balance: <strong>{{ current_point }} POINTS</strong></div>
+                        {% if not next_level_point %}
+                        <div>You have reached the highest level, please redeem your giftcard.</div>
+                        {% else %}
+                        <div>You're only <strong>{{ next_level_point - current_point }} points</strong> away from your next <strong>${{ next_level_reward }} voucher</strong></div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: {{ (current_point / next_level_point) * 100 }}%;" aria-valuenow="{{ current_point }}" aria-valuemin="0" aria-valuemax="{{ next_level_point }}">
+                                <span>{{ current_point }} / {{ next_level_point }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>                       
+</section>
+
+{% endblock %}

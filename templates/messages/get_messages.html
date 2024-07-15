@@ -1,0 +1,84 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <section class="section">
+        <div class="container">
+          <div class="card p-4">
+              <div class="card-body">
+                  <!-- Bordered Tabs -->
+                  <h5 class="card-title">My Inbox</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable" id="myTable">
+                          <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for cus_message in cus_messages %}
+                            <tr>
+                                <td>
+                                  <a href="{{ cus_message.message_id }}" style="font-weight: bold; color: blue;" data-bs-toggle="modal" data-bs-target="#messageModal{{ cus_message.message_id }}" onclick="readMessage(this)">{{ cus_message.message_subject }}</a>                                </td>
+                                <td style="font-weight: bold; color: blue;">{{ cus_message.message_timestamp|nzdatetime }}</td>
+                            </tr>
+
+                            <!-- Modal -->
+                            <div class="modal" id="messageModal{{ cus_message.message_id }}" tabindex="-1" aria-labelledby="messageModalLabel{{ cus_message.message_id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="messageModalLabel{{ cus_message.message_id }}"></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="font-weight: bold; padding: 3%;">
+                                            <h5>Subject: {{ cus_message.message_subject }}</h5>
+                                            <br> 
+                                            <h6>Date: {{ cus_message.message_timestamp|nzdatetime }}</h6>
+                                            <br>
+                                            <textarea rows="7" readonly>{{ cus_message.message_content }}</textarea>
+                                            <br><br><br><br>
+                                            <div>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="float: left;bottom: 25%; position: relative;">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+
+{% endblock %}
+
+
+{% block js %} 
+<script>
+function readMessage(element) {
+    var row = element.closest('tr');
+    var tds = row.getElementsByTagName('td');
+
+    for (var i = 0; i < tds.length; i++) {
+        tds[i].style.fontWeight = 'normal';
+    }
+
+    var firstTd = tds[0];
+    var aTag = firstTd.getElementsByTagName('a')[0];
+    if (aTag) {
+        aTag.style.fontWeight = 'normal';
+    }
+}
+</script>
+{% endblock %}

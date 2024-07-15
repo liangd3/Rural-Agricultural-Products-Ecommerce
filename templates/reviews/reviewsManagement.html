@@ -1,0 +1,145 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+{% block css %}
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-block;
+}
+</style>
+
+{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Review Management</h1>
+      <nav>
+        <ol class="breadcrumb">
+          {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+          <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+          <li class="breadcrumb-item active">Review Management</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+              <div class="card-body">
+                  <!-- Bordered Tabs -->
+                  <h5 class="card-title">Review Management</h5>
+                  <div class="mb-3">
+                      <form id="hideForm" action="/reviews/hideReview" method="post" style="display: none;">
+                        <input type="hidden" id="selectedId" name="selectedId">
+                      </form>
+                      <form id="showForm" action="/reviews/showReview" method="post" style="display: none;">
+                        <input type="hidden" id="selectedReviewId" name="selectedReviewId">
+                      </form>
+                  </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr style="text-align: center;">
+                                    <th>Image</th>
+                                    <th>Product</th>
+                                    <th>User ID</th>
+                                    <th>Review</th>
+                                    <th>Rating</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for review in reviews %}
+                                <tr>
+                                  <td>
+                                    {% if review.product_image %}
+                                    <img src="/blueprints/static/product_image/{{ review.product_image }}" class="img-thumbnail" style="max-width: 75px; max-height: 75px;">
+                                      {% else %}
+                                      <img src="/blueprints/static/product_image/default-image.jpg" alt="Product" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                                      {% endif %}
+                                    </td>
+                                  <td>{{ review.product_name }}</td>
+                                  <td>{{ review.user_id }}</td>
+                                  <td>{{ review.review_comment }}</td>
+                                  <td style="text-align: center;">{{ review.rating_value }}</td>
+                                  <td>{{ review.review_date|nzdate }}</td>
+                                  <td>
+                                      <input type="hidden" name="review_id" id="review_id" value="{{ review.product_id }}">
+                                      {% if review.review_status == 1 %}
+                                      <div class="button-group">
+                                        <button type="button" id="hideButton" class="btn btn-danger" onclick="hideSelected('{{ review.product_id }}')">Hide</button>
+                                        <button type="button" id="showButton" class="btn btn-success" onclick="showSelected('{{ review.product_id }}')" disabled>Show</button>
+                                      </div>
+                                      {% else %}
+                                      <div class="button-group">
+                                        <button type="button" id="hideButton" class="btn btn-danger" onclick="hideSelected('{{ review.product_id }}')" disabled>Hide</button>
+                                        <button type="button" id="showButton" class="btn btn-success" onclick="showSelected('{{ review.product_id }}')">Show</button>
+                                      </div>
+                                      {% endif %}
+                                  </td>
+                              </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+// hide selected record
+function hideSelected(productId) {
+
+    var hideForm = document.getElementById('hideForm');
+    var selectedIdInput = document.getElementById('selectedId');
+    selectedIdInput.value = productId;
+    hideForm.submit();
+}
+
+// show selected record
+function showSelected(productId) {
+
+var showForm = document.getElementById('showForm');
+var selectedReviewIdInput = document.getElementById('selectedReviewId');
+selectedReviewIdInput.value = productId;
+showForm.submit();
+}
+</script>
+
+{% endblock %}

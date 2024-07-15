@@ -1,0 +1,164 @@
+{% if session['user_type'] == 'staff' %}
+{% extends 'staff/staff_layout.html' %} 
+{% elif session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies - New Product{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>New Product</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('internal.inventory_list')}}">Inventory</a></li>
+          <li class="breadcrumb-item active">New Product</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+        <div class="col-xl-12">
+          <form method="POST" enctype=multipart/form-data action="{{url_for('internal.addProduct', role = 'manager')}}" >
+                <div class="card">
+                  <div class="card-body pt-3">
+
+                    <div class="row mb-3">
+                      <label for="name" class="col-md-4 col-lg-3 col-form-label">Name</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="name" type="text" class="form-control" id="name" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="description" class="col-md-4 col-lg-3 col-form-label">Description</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="description" class="form-control" id="description" rows="4" required></textarea>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="price" class="col-md-4 col-lg-3 col-form-label">Price</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="price" type="number" class="form-control" id="price" required step="0.01" min="0.00" max="9999.99">
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="category" class="col-md-4 col-lg-3 col-form-label">Category</label>
+                      <div class="col-md-8 col-lg-9">
+                        <select name="category" class="form-control" id="subcatSelector" onchange="updateSubcategory(event)" required>
+                          <option selected disabled>Choose from below</option>
+                          {% for category in allCategories %}
+                            <option value="{{category.category_id}}">{{category.category_name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="subcategory" class="col-md-4 col-lg-3 col-form-label">Subcategory</label>
+                        <div class="col-md-8 col-lg-9">
+                          <select name="subcategory" id="subcategory" class="form-control" required>
+                          </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="quantity" class="col-md-4 col-lg-3 col-form-label">Quantity</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="quantity" type="number" step="1" class="form-control" id="quantity" value="1"   min="1"     required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="oversized" class="col-md-4 col-lg-3 col-form-label">Oversized</label>
+                      <div class="col-md-8 col-lg-9">
+                       
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="0" checked>
+                          <label class="col-md-4" for="0">Standard</label>
+                        </div>
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="1">
+                          <label class="col-md-4" for="1">Oversize</label>
+                        </div>
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="2" >
+                          <label class="col-md-4" for="0">Too big, must pick-up</label>
+                        </div>
+
+
+
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="uploadInputFile" class="col-md-4 col-lg-3 col-form-label">Product Image</label>
+                      <div class="col-md-8 col-lg-9">
+                        <img class="img-fluid" src="#" alt="Image Preview" id="imagePreview" style="display:none; max-width: 20vw; max-height: 20vh;">
+                        <div class="pt-2 row">
+                            <input type="file" multiple name="uploadInputFile" id="uploadInputFile" class="col-md-6" onblur="getElementById('imagePreview').style.display = 'block';">
+                            <button class="btn btn-danger btn-sm col-md-1" title="Remove my product image" onclick="getElementById('uploadInputFile').value = '';"><i class="bi bi-trash"></i></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </div>
+                </div>
+          </form>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+<script>
+  async function updateSubcategory(event) {
+    const selectedOption = event.target.value;
+
+    const response = await fetch('/inventory/product/get-subcategory', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ selected_option: selectedOption }),
+    });
+
+    if (response.ok) {
+        const options = await response.json();
+        const subOptionsSelect = document.getElementById('subcategory');
+        subOptionsSelect.innerHTML = '';
+
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+
+            optionElement.value = option;
+            optionElement.textContent = option;
+            subOptionsSelect.appendChild(optionElement);
+        });
+    } else {
+        alert('Failed to load options');
+    }
+  }
+  uploadInputFile.onchange = evt => {
+  const [file] = uploadInputFile.files
+  if (file) {
+    imagePreview.src = URL.createObjectURL(file)
+  }
+}
+</script>
+
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+	<!-- Meta Tag -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag -->  
+    <title>{% block title %}{% endblock %}</title>
+	<!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='customer/images/favicon.png') }}">
+	<!-- Bootstrap Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<!-- Web Font -->
+	<link href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+	<!-- jQuery CDN -->
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js" integrity="sha256-sw0iNNXmOJbQhYFuC9OF2kOlD5KQKe1y5lfBn4C9Sjg=" crossorigin="anonymous"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- Shopping cart -->
+	<script src="{{url_for('static', filename='shopping-cart.js')}}"></script>
+
+	
+	<!-- StyleSheet -->
+	
+	<!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<!-- Magnific Popup -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/magnific-popup.min.css') }}">
+	<!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/font-awesome.css') }}">
+	<!-- Fancybox -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/jquery.fancybox.min.css') }}">
+	<!-- Themify Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/themify-icons.css') }}">
+	<!-- Nice Select CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/niceselect.css') }}">
+	<!-- Animate CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/animate.css') }}">
+	<!-- Flex Slider CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/flexslider-rtl-min.css') }}">
+	<!-- Owl Carousel -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/owl.carousel.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='customer/css/owl.theme.default.min.css') }}">
+	<!-- Slicknav -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/slicknav.min.css') }}">
+	
+	<!-- Eshop StyleSheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='customer/css/responsive.css') }}">
+
+	{% block css %}{% endblock %}
+</head>
+<body class="js" onload="updateCartOverview()">
+	
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+	
+	
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+							<ul class="list-main">
+								<li><i class="ti-headphone-alt"></i> +064 (21) 1234567</li>
+								<li><i class="ti-email"></i> support@moacreek.com</li>
+							</ul>
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						{% if not session %}
+						<div class="right-content">
+							<ul class="list-main">                                
+                                <li><i class="bi bi-person-fill-add"></i><a href="{{ url_for('user.register') }}">Register</a></li>
+								<li><i class="bi bi-box-arrow-in-left"></i><a href="{{ url_for('user.login') }}">Log In</a></li>
+							</ul>
+						</div>
+
+						{% else %}
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li> Hello, {% if session.first_name %}{{session.first_name}} {%else%} New User {%endif%}! </li>
+								<li>
+									{% if cus_messages %}
+									<i class="ti-email">
+										<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="padding: 30% 30%;">
+										</span>
+									</i> <a href="{{ url_for('customer.get_messages') }}">Inbox</a>
+									{% else %}
+									<i class="ti-email">
+									</i> <a href="{{ url_for('customer.get_messages') }}">Inbox</a>
+									{% endif %}
+								</li>
+								<li><i class="ti-user"></i> <a href="{{ url_for('customer.customer_profile') }}">My account</a></li>
+								<li><i class="ti-power-off"></i><a href="{{ url_for('user.logout') }}">Log out</a></li>
+							</ul>
+						</div>
+						{% endif %}
+						<!-- End Top Right -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Topbar -->
+		<div class="middle-inner">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-2 col-12">
+						<!-- Logo -->
+						<div class="logo">
+							<a href="{{ url_for('common.home') }}"><img src="{{ url_for('static', filename='customer/images/logo.png') }}" alt="logo">
+						</div>
+						<!--/ End Logo -->
+						<!-- Search Form -->
+						<div class="search-top">
+							<div class="top-search"><a href="#0"><i class="ti-search"></i></a></div>
+							<!-- Search Form -->
+							<div class="search-top">
+								<form class="search-form">
+									<input type="text" placeholder="Search here..." name="search">
+									<button value="search" type="submit"><i class="ti-search"></i></button>
+								</form>
+							</div>
+							<!--/ End Search Form -->
+						</div>
+						<!--/ End Search Form -->
+						<div class="mobile-nav"></div>
+					</div>
+
+				
+					<div class="col-lg-8 col-md-7 col-12">
+						<div class="search-bar-top">
+							<div class="search-bar">
+								
+									
+								<select name="search_subcategory">
+									<option selected="selected" value="">All Category</option>
+									{% for category in categories %}
+									<option value="{{category.category_id}}">{{category.category_name}}</option>
+									{% endfor %}
+								</select>
+									
+								<form method="POST" action="{{ url_for('customer.all_products') }}">
+									<input name="search" placeholder="Search Products Here....." type="search" >
+									<button class="btnn" ><i class="ti-search"></i></button>
+								</form>
+							
+							</div>
+						</div>
+					</div>
+				
+					<div class="col-lg-2 col-md-3 col-12">
+						<div class="right-bar">
+							<!-- Search Form -->
+						
+							<div class="sinlge-bar">
+								<a href="{{ url_for('customer.customer_profile') }}" class="single-icon"><i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+							</div>
+							<div class="sinlge-bar shopping"  onmouseenter="updateCartOverview()">
+								<a href="{{ url_for('customer.cart') }}" class="single-icon"><i class="ti-bag"></i> <span class="total-count" id="total-count"></span></a>
+								<!-- Shopping Item -->
+								<div class="shopping-item">
+									<div class="dropdown-cart-header">
+										<span id="total-count-in-cart"></span>
+										<a href="{{ url_for('customer.cart') }}">View Cart</a>
+									</div>
+									<ul class="shopping-list" id="shopping-list">
+									</ul>
+									<div class="bottom">
+										<div class="total">
+											<span>Total</span>
+											<span class="total-amount" id="total-amount">$134.00</span>
+										</div>
+										<form method="POST" action="{{url_for('customer.checkout')}}">
+											<div class="button5">
+												<input name="pickup" type="checkbox" unchecked hidden>
+												<button type="submit" class="btn">Checkout</button>
+											</div>
+										</form>
+									</div>
+								</div>
+								<!--/ End Shopping Item -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Header Inner -->
+		<div class="header-inner">
+			<div class="container-lg">
+				<div class="cat-nav-head">
+					<div class="row">
+						{% if products and not request.args.get('subcategory')%}
+						<div class="col-lg-3">
+							
+							<div class="all-category">
+								<a href="{{ url_for('customer.all_products') }}"><h3 class="cat-heading"><i class="fa fa-bars" aria-hidden="true"></i>CATEGORIES</h3></a>
+								
+								<ul class="main-category">
+									{% for category in categories %}
+									<li><a href="#">{{category.category_name}} <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+										<ul class="sub-category">
+											{% for subcategory in subcategories %}
+											{% if subcategory.category_id == category.category_id %}
+											<li><a href="/customer/products#{{subcategory.subcategory_id}}" data-bs-target="#{{subcategory.subcategory_id}}">{{subcategory.subcategory_name}}</a></li>
+											{% endif %}
+											{% endfor %}
+										</ul>
+									</li>
+									{% endfor %}
+								</ul>
+								
+							</div>
+							
+						</div>
+						{% else %}
+						<div class="col-lg-3">
+							
+							<div class="all-category">
+								<a href="{{ url_for('customer.all_products') }}"><h3 class="cat-heading"><i class="fa fa-bars" aria-hidden="true"></i>CATEGORIES</h3></a>
+								
+								<ul class="main-category">
+									{% for category in categories %}
+									<li><a href="#">{{category.category_name}} <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+										<ul class="sub-category">
+											{% for subcategory in subcategories %}
+											{% if subcategory.category_id == category.category_id %}
+											<li><a href="#" onclick="all_products({{ subcategory.subcategory_id }})"  data-bs-target="#{{subcategory.subcategory_id}}">{{subcategory.subcategory_name}}</a></li>
+											{% endif %}
+											{% endfor %}
+										</ul>
+									</li>
+									{% endfor %}
+								</ul>
+								
+							</div>
+							
+						</div>
+
+
+
+						{% endif %}
+						<div class="col-lg-9 col-12">
+							<div class="menu-area">
+								<!-- Main Menu -->
+								<nav class="navbar navbar-expand-lg">
+									<div class="navbar-collapse">	
+										<div class="nav-inner">	
+											<ul class="nav main-menu menu navbar-nav">
+													<li><a href="{{ url_for('customer.all_products') }}">Products</a></li>												
+													<li><a href="{{ url_for('customer.customer_orders') }}">Orders</a></li>
+                                                    <li><a href="{{ url_for('customer.giftcardCenter') }}">Gift Card</a></li>
+                                                    <li><a href="{{ url_for('customer.checkRewards') }}">Rewards<span class="new">New</span></a></li>
+
+													{% if session and session['credit_limit'] and session['credit_limit'] > 0.00 %}
+													<li><a href="{{ url_for('customer.customer_credit') }}">Monthly Credit</a></li>
+													
+													{% else	%}
+													<li><a href="{{ url_for('customer.customer_account_holder') }}">Monthly Payment</a></li>	
+													{% endif %}
+													<li><a href="{{ url_for('customer.send_messages_to_lv1') }}">Contact Us</a></li>
+													<li><a href="/customer#F.A.Q">F.A.Q</a></li>
+												</ul>
+										</div>
+									</div>
+								</nav>
+								<!--/ End Main Menu -->	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--/ End Header Inner -->
+	</header>
+	<!--/ End Header -->
+	{% block content %}{% endblock %}
+	<!-- Start Footer Area -->
+	<footer class="footer">
+		<!-- Footer Top -->
+		<div class="footer-top section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-5 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer about">
+							<div class="logo">
+                                <a href="{{ url_for('customer.customer_dashboard') }}">
+                                    <img src="{{ url_for('static', filename='customer/images/logo2.png') }}" alt="#">
+                                </a>
+							</div>
+							<p class="text">Join us in celebrating the spirit of New Zealand's rural communities by choosing local and supporting our hardworking farmers. With each purchase, you not only enjoy premium quality products but also contribute to the preservation of our cherished agricultural heritage.</p>
+							<p class="call">Got Question? Call us 24/7<span><a href="tel:123456789">+064 (21) 1234567</a></span></p>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Information</h4>
+							<ul>
+								<li><a href="#">About Us</a></li>
+								<li><a href="#F.A.Q">Faq</a></li>
+								<li><a href="#">Terms & Conditions</a></li>
+								<li><a href="{{ url_for('customer.send_messages_to_lv1') }}">Contact Us</a></li>
+								<li><a href="#">Help</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Customer Service</h4>
+							<ul>
+								<li><a href="#">Payment Methods</a></li>
+								<li><a href="#">Money-back</a></li>
+								<li><a href="#">Returns</a></li>
+								<li><a href="#">Shipping</a></li>
+								<li><a href="#">Privacy Policy</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-3 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer social">
+							<h4>Get In Tuch</h4>
+							<!-- Single Widget -->
+							<div class="contact">
+								<ul>
+									<li>42 Farmland Road</li>
+									<li>Alexandra, Central Otago</li>
+									<li>support@moacreek.com</li>
+									<li>+064 (21) 1234567</li>
+								</ul>
+							</div>
+							<!-- End Single Widget -->
+							<ul>
+								<li><a href="#"><i class="ti-facebook"></i></a></li>
+								<li><a href="#"><i class="ti-twitter"></i></a></li>
+								<li><a href="#"><i class="ti-flickr"></i></a></li>
+								<li><a href="#"><i class="ti-instagram"></i></a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Footer Top -->
+		<div class="copyright">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 2024 Group AR2  -  All Rights Reserved.</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+                                <img src="{{ url_for('static', filename='customer/images/payments.png') }}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+ 
+	<!-- Popper JS -->
+    <script src="{{ url_for('static', filename='customer/js/popper.min.js') }}"></script>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="{{ url_for('static', filename='customer/js/bootstrap.min.js') }}"></script> -->
+	<!-- Slicknav JS -->
+    <script src="{{ url_for('static', filename='customer/js/slicknav.min.js') }}"></script>
+	<!-- Owl Carousel JS -->
+    <script src="{{ url_for('static', filename='customer/js/owl.carousel.min.js') }}"></script>
+	<!-- Magnific Popup JS -->
+    <script src="{{ url_for('static', filename='customer/js/magnific-popup.js') }}"></script>
+	<!-- Waypoints JS -->
+    <script src="{{ url_for('static', filename='customer/js/waypoints.js') }}"></script>
+	<!-- Countdown JS -->
+    <script src="{{ url_for('static', filename='customer/js/finalcountdown.min.js') }}"></script>
+	<!-- Nice Select JS -->
+    <script src="{{ url_for('static', filename='customer/js/jquery.nice-select.js') }}"></script>
+	<!-- Flex Slider JS -->
+    <script src="{{ url_for('static', filename='customer/js/jquery.flexslider-min.js') }}"></script>
+	<!-- ScrollUp JS -->
+    <script src="{{ url_for('static', filename='customer/js/scrollup.js') }}"></script>
+	<!-- Onepage Nav JS -->
+    <script src="{{ url_for('static', filename='customer/js/onepage-nav.min.js') }}"></script>
+	<!-- Easing JS -->
+    <script src="{{ url_for('static', filename='customer/js/easing.js') }}"></script>
+	<!-- Active JS -->
+    <script src="{{ url_for('static', filename='customer/js/active.js') }}"></script>
+	{% block js %} {% endblock%}
+
+	  <!-- Toasts Container -->
+
+	<div aria-live="polite" aria-atomic="true" class="position-relative">
+		<div id="toastContainerFlash" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
+		  <!-- Toasts will be added here dynamically -->
+		</div>
+	</div>
+
+	<script>
+	  document.addEventListener('DOMContentLoaded', function() {
+		var messages = JSON.parse('{{ get_flashed_messages(with_categories=true) | tojson | safe }}');
+		var toastContainer = document.getElementById('toastContainerFlash');
+	  
+		messages.forEach(function(message) {
+		  var category = message[0], content = message[1];
+		  // Define background classes based on message category
+		  var bgClass = category === 'success' ? 'bg-success text-white' : 
+						category === 'danger' ? 'bg-danger text-white' : 
+						category === 'warning' ? 'bg-warning' : 
+						'bg-primary text-white'; // Default case
+	  
+		  var toastHtml = `
+			<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+			  <div class="toast-header">
+				<strong class="me-auto">Notification</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			  </div>
+			  <div class="toast-body ${bgClass}">
+				${content}
+			  </div>
+			</div>
+		  `;
+		  console.log('message running')
+
+		  toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+		});
+	  
+		var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+		var toastList = toastElList.map(function(toastEl) {
+		  return new bootstrap.Toast(toastEl).show();
+		});
+	  });
+	  </script> <!---End toast-->   
+
+	<!-- Subcategory links navigation -->
+	<script>
+		$(document).ready(function() {
+
+			if(window.location.hash) {
+				var hash = window.location.hash;
+
+				$('a[data-bs-toggle="tab"][href="' + hash + '"]').tab('show');
+			}
+
+			$('a[data-bs-target]').on('click', function(e) {
+				e.preventDefault();
+
+				var target = $(this).attr('data-bs-target');
+
+				$('a[data-bs-toggle="tab"][href="' + target + '"]').tab('show');
+
+				$('html, body').animate({
+					scrollTop: $("#products").offset().top
+				}, 500);
+			});
+		});
+
+
+		function all_products(subcategoryId) {
+    var url = "{{ url_for('customer.all_products') }}?subcategory=" + subcategoryId;
+    window.location.href = url;
+
+}
+
+
+
+	</script>
+</body>
+</html>

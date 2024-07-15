@@ -1,0 +1,386 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+{% block title %} Moa Creek Rural Supplies - {{promotion.promotion_name}}{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Promotions</h1>
+      <nav>
+        <ol class="breadcrumb">
+          {% if session['user_type'] == 'admin' %}
+           <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Home</a></li>
+           {% elif session['user_type'] == 'manager' %}
+          <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_dashboard') }}">Home</a></li>
+          
+          {% endif %}
+          <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_promotion_management') }}">Promotion List</a></li>
+          <li class="breadcrumb-item active">{{promotion.promotion_name}}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+        <div class="col">
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#promotion-overview">Overview</button>
+                </li>
+
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#edit">Edit</button>
+                </li>
+                
+                <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#promotion-type">
+                {% if promotion.promotion_type == 'category' %}Categories
+                {% elif promotion.promotion_type == 'subcategory' %}Subcategories
+                {% elif promotion.promotion_type == 'product' %}Products
+                {% endif %}
+                </button>
+                </li>
+
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#promotion-image">Image</button>
+                </li>
+              </ul>
+              
+              <div class="tab-content pt-2">
+                
+                <!-- Promotion Overview -->
+                <div class="tab-pane fade show active profile-overview" id="promotion-overview">
+                  <h5 class="card-title">{{ promotion.promotion_name }} 
+                    <td>{% if promotion.status == "Active" %}
+                      <span class="badge bg-danger text-white">
+                    {% elif promotion.status == "Coming Soon" %}
+                      <span class="badge bg-success text-white">
+                    {% elif promotion.status == "Expired" %}
+                      <span class="badge bg-secondary text-white">
+                    {% else %}
+                      <span class="badge bg-info text-white">
+                    {% endif %}
+                    {{promotion.status}}
+                    </td>
+                  </h5>
+
+                  <p class="small fst-italic"> {{promotion.promotion_description}}</p>
+                  
+                  <h5 class="card-title">Promotion Details</h5>
+                  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Type</div>
+                    <div class="col-lg-9 col-md-8 text-capitalize"> {{ promotion.promotion_type }} </div>
+                  </div>
+
+                  {% if categories %}
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Categories</div>
+                    <div class="col-lg-9 col-md-8"> 
+                      {% for category in categories %}
+                        {{ category.category_id }} - {{category.category_name}}<br>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% elif subcategories %}
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Subcategories</div>
+                    <div class="col-lg-9 col-md-8"> 
+                      {% for subcategory in subcategories %}
+                        {{ subcategory.subcategory_id }} - {{subcategory.subcategory_name}}<br>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% elif products %}
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Products</div>
+                    <div class="col-lg-9 col-md-8"> 
+                      {% for product in products %}
+                        {{ product.product_id }} - {{product.product_name}}<br>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% endif %}
+                  
+                  {% set discount  = (promotion.discount_rate|float * 100) | int %}
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Discount</div>
+                    <div class="col-lg-9 col-md-8">
+                      {% if promotion.special_condition %}
+                      {{promotion.special_condition}}
+                      {% else %}
+                      {{ discount }}%
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Start Date</div>
+                    <div class="col-lg-9 col-md-8"> {{ promotion.start_date | nzdatetime}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">End Date</div>
+                    <div class="col-lg-9 col-md-8">  {{ promotion.end_date | nzdatetime}}</div>
+                  </div>
+
+                </div><!-- End Promotion Overview -->
+
+                <!-- Promotion Edit  -->
+                <div class="tab-pane fade edit" id="edit">
+                  <div class="row">
+                    <div class="col-lg-9">
+                      <h5 class="card-title">{{ promotion.promotion_name }} 
+                        <td>{% if promotion.status == "Active" %}
+                          <span class="badge bg-danger text-white">
+                        {% elif promotion.status == "Coming Soon" %}
+                          <span class="badge bg-success text-white">
+                        {% elif promotion.status == "Expired" %}
+                          <span class="badge bg-secondary text-white">
+                        {% else %}
+                          <span class="badge bg-info text-white">
+                        {% endif %}
+                        {{promotion.status}}
+                        </td>
+                      </h5>
+                    </div>
+                    <div class="col-lg-3 card-title">
+                      {% if promotion.promotion_id != 1%}
+                      <form action="{{url_for('manager.promotion_delete', id = promotion.promotion_id)}}" method="post" onsubmit="return confirm('Confirm to delete this promotion? This action cannot be reversed.');">
+                        <input type="submit" class="btn btn-sm btn-danger" value="Delete"/>
+                      </form>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <form method="POST" action="{{ url_for('manager.promotion_edit', id = promotion.promotion_id) }}" >
+                    <div class="row mb-3">
+                      <label for="name" class="col-md-4 col-lg-3 col-form-label">Promotion Name</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="name" type="text" class="form-control" id="name" value="{{promotion.promotion_name}}" required>
+                      </div>
+                    </div>
+  
+                    <div class="row mb-3">
+                      <label for="description" class="col-md-4 col-lg-3 col-form-label">Promotion Description</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="description" class="form-control" id="description" rows="4" required>{{promotion.promotion_description}}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="type" class="col-md-4 col-lg-3 col-form-label">Type</label>
+                      <div class="col-md-8 col-lg-9">
+                        <select name="type" class="form-select" id="type" onchange="if(this.value!='d'){alert('Caution! All related promotion categories/subcategories/products data will be deleted if type is changed. This action cannot be reversed.');}">
+                          <option value="category" {% if catagories %}selected{% endif %}>Category</option>
+                          <option value="subcategory" {% if subcategories %}selected{% endif %}>Subcategory</option>
+                          <option value="product" {% if products %}selected{% endif %}>Product</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="discount_type" class="col-md-4 col-lg-3 col-form-label">Discount Type</label>
+                      <div class="col-md-8 col-lg-9">
+                        <select name="discount_type" class="form-control" id="discount-type" required>
+                          <option value="buyOneGetOneFree" {% if promotion.special_condition == 'buyOneGetOneFree' %}selected{% endif %}>Buy One Get One Free</option>
+                          <option value="rate" {% if not promotion.special_condition %}selected{% endif %}>Fixed Rate</option>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3" id="discount-field">
+                      <label for="discount" class="col-md-4 col-lg-3 col-form-label">Discount (%)</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="discount" type="text" class="form-control" id="discount" value="{{discount}}" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="start_date" class="col-md-4 col-lg-3 col-form-label">Start Date</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="start_date" type="datetime-local" class="form-control" id="start_date" value="{{promotion.start_date | htmldatetime}}" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="end_date" class="col-md-4 col-lg-3 col-form-label">End Date</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="end_date" type="datetime-local" class="form-control" id="end_date" value="{{promotion.end_date | htmldatetime}}" required>
+                      </div>
+                    </div>
+  
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                      <input type="reset" class="ml-2 btn btn-secondary">
+                    </div>
+                  </form>
+                </div><!-- End Profile Edit Form -->
+                
+
+                  <!-- Categories Edit  -->
+                <div class="tab-pane fade promotion-type" id="promotion-type">
+                  <div class="row">
+                    <div class="col-lg-9">
+                      <h5 class="card-title">{{ promotion.promotion_name }} 
+                        <td>{% if promotion.status == "Active" %}
+                          <span class="badge bg-danger text-white">
+                        {% elif promotion.status == "Coming Soon" %}
+                          <span class="badge bg-success text-white">
+                        {% elif promotion.status == "Expired" %}
+                          <span class="badge bg-secondary text-white">
+                        {% else %}
+                          <span class="badge bg-info text-white">
+                        {% endif %}
+                        {{promotion.status}}
+                        </span>
+                        </td>
+                      </h5>
+                    </div>
+                  </div>
+                    
+                  {% if promotion.promotion_type == 'category' %}
+                  <form method="POST" action="{{ url_for('manager.promotion_type_edit', id = promotion.promotion_id, type = 'category') }}" >
+                    
+                    <div class="row mb-3">
+                      <legend class="col-form-label col-sm-2 pt-0">Categories</legend>
+                      <div class="col-sm-10">
+                        
+                        {% for category in allCategories %}
+                        <div class="form-check">
+                          <input class="form-check-input" name="itemsChecked" type="checkbox" value="{{category.category_id}}" id="{{category.category_id}}" {%if category.category_id in categories|map(attribute='category_id')%}checked{%endif%}>
+                          <label class="form-check-label" for="{{category.category_id}}">
+                            {{category.category_id}} - {{category.category_name}}
+                          </label>
+                        </div>
+                        {% endfor %}
+
+                      </div>
+                    </div>
+  
+                  {% elif promotion.promotion_type == 'subcategory' %}
+                  <form method="POST" action="{{ url_for('manager.promotion_type_edit', id = promotion.promotion_id, type = 'subcategory') }}" >
+                    
+                    <div class="row mb-3">
+                      <legend class="col-form-label col-sm-2 pt-0">Subcategories</legend>
+                      <div class="col-sm-10">
+                        
+                        {% for subcategory in allSubcategories %}
+                        <div class="form-check">
+                          <input class="form-check-input" name="itemsChecked" type="checkbox" value="{{subcategory.subcategory_id}}" id="{{subcategory.subcategory_id}}" {%if subcategory.subcategory_id in subcategories|map(attribute='subcategory_id')%}checked{%endif%}>
+                          <label class="form-check-label" for="{{subcategory.subcategory_id}}">
+                            {{subcategory.subcategory_id}} - {{subcategory.subcategory_name}}
+                          </label>
+                        </div>
+                        {% endfor %}
+
+                      </div>
+                    </div>
+
+
+                  {% elif promotion.promotion_type == 'product' %}
+                  <form method="POST" action="{{ url_for('manager.promotion_type_edit', id = promotion.promotion_id, type = 'product') }}" >
+                    
+                    <div class="row mb-3">
+                      <legend class="col-form-label col-sm-2 pt-0">Products</legend>
+                      <div class="col-sm-10">
+                        
+                        {% for product in allProducts %}
+                        <div class="form-check">
+                          <input class="form-check-input" name="itemsChecked" type="checkbox" value="{{product.product_id}}" id="{{product.product_id}}" {%if product.product_id in products|map(attribute='product_id')%}checked{%endif%}>
+                          <label class="form-check-label" for="{{product.product_id}}">
+                            {{product.product_id}} - {{product.product_name}}
+                          </label>
+                        </div>
+                        {% endfor %}
+
+                      </div>
+                    </div>
+
+                    {% endif %}
+  
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                      <input type="reset" class="ml-2 btn btn-secondary">
+                    </div>
+                  </form>
+                </div><!-- End Products Edit Form -->
+
+                <!-- Edit Image Pane-->
+                <div class="tab-pane fade promotion-image" id="promotion-image">
+                  <div class="row">
+                    <div class="col-lg-9">
+                      <h5 class="card-title">{{ promotion.promotion_name }} 
+                        <td>{% if promotion.status == "Active" %}
+                          <span class="badge bg-danger text-white">
+                        {% elif promotion.status == "Coming Soon" %}
+                          <span class="badge bg-success text-white">
+                        {% elif promotion.status == "Expired" %}
+                          <span class="badge bg-secondary text-white">
+                        {% else %}
+                          <span class="badge bg-info text-white">
+                        {% endif %}
+                        {{promotion.status}}
+                        </td>
+                      </h5>
+                    </div>
+                  </div>
+
+                    <label for="promotionImage" class="col-md-4 col-lg-3 col-form-label">Promotion Image</label>
+                    <div class="col-md-8 col-lg-9">
+                      <img src="/static/promotion_image/{{promotion.promotion_image}}" class="img-fluid" alt="Promotion Image">
+                      <div class="pt-2 row">
+                        <form action="/manager/promotion/{{promotion.promotion_id}}/uploader" method="post" enctype="multipart/form-data" class="pt-2 col-md-1">
+                          <input type="file" name="image" id="image" style="display: none;" onchange="form.submit()">
+                          <label for="image" class="btn btn-primary btn-sm" title="Upload new promotion image"><i class="bi bi-upload"></i></label>
+                        </form>
+                        
+                        <form action="/manager/promotion/{{promotion.promotion_id}}/delete" method="post" enctype="multipart/form-data" class="pt-2 col-md-1">
+                          <button type="submit" class="btn btn-danger btn-sm" title="Remove my promotion image"><i class="bi bi-trash"></i></button>
+                        </form>
+                        
+                      </div>
+                    </div>
+
+                </div>
+
+
+
+
+              </div><!-- End Bordered Tabs -->
+
+              
+            </div>
+          </div>
+        </div>
+      
+    </section>
+
+</main><!-- End #main -->
+
+<script>
+$(document).ready(function(){
+  $('#discount-type').on('change', function(){
+    var type = $(this).val();
+    if (type == 'buyOneGetOneFree') {
+      $('#discount-field').hide();
+      $('#discount-field').removeAttr('required');
+    } else {
+      $('#discount-field').show();
+      $('#discount-field').prop('required', true);
+    }
+  });
+});
+</script>
+
+{% endblock %}

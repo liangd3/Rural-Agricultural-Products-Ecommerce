@@ -1,0 +1,138 @@
+{% extends 'admin/admin_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Manager {% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Admin Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="col-lg-10">
+      <div class="row">
+        <!-- User -->
+        <div class="col-xxl-4 col-xl-12">
+          <div class="card info-card user-card">
+            <div class="card-body">
+              <h5 class="card-title">Users <span>| Total</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="ps-3">
+                  <a href="{{ url_for('admin.admin_users_management') }}">
+                    <h6>{{user_count}}</h6>
+                    <span class="text-success small pt-1 fw-bold">{{ customer_count }}</span> <span class="text-muted small pt-2 ps-1">Customer</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Inbox -->
+
+        <!-- Products -->
+        <div class="col-xxl-4 col-md-6">
+          <div class="card info-card products-card">
+            <div class="card-body">
+              <h5 class="card-title">Products <span>| Total</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" >
+                  <i class="bi bi-table"></i>
+                </div>
+                <div class="ps-3">
+                  <a href="{{url_for('internal.inventory_list', role = 'admin')}}">
+                    <h6>{{ product_count }}</h6>
+                    <span class="text-success small pt-1 fw-bold">{{ active_product_count }}</span> <span class="text-muted small pt-2 ps-1">Active</span>
+                    <span class="text-danger small pt-1 fw-bold">{{ inactive_product_count }}</span> <span class="text-muted small pt-2 ps-1">Inactive</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Products -->
+
+        <!-- Orders -->
+        <div class="col-xxl-4 col-md-6">
+          <div class="card info-card orders-card">
+            <div class="card-body">
+              <h5 class="card-title">Orders <span>| This Month</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="bi bi-cart-check"></i>
+                </div>
+                <div class="ps-3">
+                  <a href="{{ url_for('internal.orderManagement') }}">
+                    <h6>{{this_month_order_count}}</h6>
+                    <span class="text-success small pt-1 fw-bold">{{last_month_order_count}}</span> <span class="text-muted small pt-2 ps-1">Last Month</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Orders -->
+
+      
+
+        <!-- Shipping Prices -->
+        <div class="col-xxl-6 col-md-6">
+          <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+              <h5 class="card-title">Shipping Prices <span>| Current</span></h5>
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">Shipping Method</th>
+                    <th scope="col">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in shipping %}
+                  <tr>
+                    <td><a href="{{url_for('admin.admin_shippingPriceManagement')}}">{{ s.shipping_name }}</a></td>
+                    <td>{{ s.shipping_price }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div><!-- End Shipping Prices -->
+
+        <!-- Account Holder Credit Limits -->
+        <div class="col-xxl-6 col-md-6">
+          <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+              <h5 class="card-title">Account Holder Credit Limits <span>| Current</span></h5>
+                <table class="table table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">Account Holder Name</th>
+                      <th scope="col">Remaining Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for account in accounts %}
+                    <tr>
+                      <td><a href="{{url_for('manager.accountholderManagement')}}">{{account.first_name}} {{ account.last_name }} </a></td>
+                      <td>${% if account.credit_used %} {{ account.credit_limit - account.credit_used}} {%else%} {{ account.credit_limit }}{%endif%}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div><!-- End Account Holder Credit Limits -->
+
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+
+{% endblock %}

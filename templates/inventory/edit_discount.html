@@ -1,0 +1,127 @@
+{% if session['user_type'] == 'staff' %}
+    {% extends 'staff/staff_layout.html' %} 
+{% elif session['user_type'] == 'manager' %}
+    {% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+    {% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Promotions</h1>
+        <nav>
+            <ol class="breadcrumb">
+                {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+                <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+                <li class="breadcrumb-item active">Everyday Discount</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+    <section class="section profile">
+        <div class="col">
+            <div class="card">
+                <div class="card-body pt-3">
+                    <!-- Bordered Tabs -->
+                    <div class="tab-content pt-2">
+                        <!-- Promotion Overview -->
+                        <div class="tab-pane fade show active profile-overview" id="promotion-overview">
+                            <p class="small fst-italic">{{promotion.promotion_description}}</p>
+                            <h5 class="card-title">{% set discount  = (promotion.discount_rate|float * 100) | int %}
+                                <div class="row">
+                                  <div class="col-lg-3 col-md-4 label ">Discount</div>
+                                  <div class="col-lg-9 col-md-8"> {{ discount }}%</div>
+                                </div></h5>
+                           
+                            <div class="row">
+                                <div class="col-lg-3 col-md-4 label ">Discounted Products</div>
+                                <div class="col-lg-9 col-md-8">
+                                    <ul id="list" style="list-style-type:none;">
+                                        {% for product in products %}
+                                        <li id="list-{{ product.product_id }}">{{ product.product_id }} - {{product.product_name}}</li>
+                                    {% endfor %}
+                                    </ul>
+                                    
+                                </div>
+                            </div>
+                        </div><!-- End Promotion Overview -->
+                        <!-- Promotion Edit -->
+                        <div >
+                            <form method="post" action="{{url_for('internal.editDiscount')}}">
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Categories</div>
+                                    <div class="col-lg-9 col-md-8">
+                                    <select name="categoryInput" onchange="this.form.submit()">
+                                        <option value="">Select a category</option>
+                                        {% for category in allCategories%}
+                                            {% if categorySelected|int == category.category_id|int %}
+                                                <option value="{{category.category_id}}" selected>
+                                            {% else %}
+                                                <option value="{{category.category_id}}">
+                                            {% endif %}
+                                                {{category.category_id}} {{category.category_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Subcategories</div>
+                                    <div class="col-lg-9 col-md-8">
+                                        <select name="subcategoryInput" onchange="this.form.submit()">
+                                            <option value="">Select a subcategory</option>
+                                            {% for subcategory in allSubcategories%}
+                                            {% if subcategorySelected|int == subcategory.subcategory_id|int %}
+                                                <option value="{{subcategory.subcategory_id}}" selected>
+                                            {% else %}
+                                                <option value="{{subcategory.subcategory_id}}">
+                                            {% endif %}
+                                                {{subcategory.subcategory_id}} {{subcategory.subcategory_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                           
+                            <form method="POST" action="{{ url_for('internal.editDiscountAll') }}" >
+                                <div class="row mb-3">
+                                    <legend class="col-form-label col-sm-3 pt-0">Products</legend>
+                                    <div class="col-sm-9">
+                                        {% for product in allProducts %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="itemsChecked" type="checkbox" value="{{product.product_id}}" id="box-{{product.product_id}}" {%if product.product_id in products|map(attribute='product_id')%}checked{%endif%} onchange="changeDiscountStatus({{product.product_id}}, '{{product.product_name}}')">
+                                                <input hidden type="text" name="allItemsShown" value="{{product.product_id}}">
+                                                <label class="form-check-label" for="{{product.product_id}}">
+                                                    {{product.product_id}} - {{product.product_name}}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="submit" name="action" value="checkAll" class="btn btn-success">Check All</button>
+                                    <button type="submit" name="action" value="uncheckAll" class="btn btn-warning">Uncheck All</button>
+                                    {% if categorySelected or subcategorySelected %}
+                                    <a href="{{url_for('internal.editDiscount')}}" class="ml-2 btn btn-secondary">Reset Filter</a>
+                                    {% endif %}
+                                </div>
+                                
+                            </form>
+                        </div><!-- End Promotion Edit -->
+                    </div><!-- End Bordered Tabs -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+
+]
+<script src="{{url_for('static', filename='edit-discount.js')}}"></script>
+
+{% endblock %}
+
+
+    
+
+

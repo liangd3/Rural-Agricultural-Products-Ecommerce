@@ -1,0 +1,367 @@
+{% if session['user_type'] == 'staff' %}
+{% extends 'staff/staff_layout.html' %} 
+{% elif session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies - {{product.product_name}}{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    {% if product.subcategory_id == 1 %}
+    <h1>Giftcard Detail</h1>
+    {% else %}
+    <h1>Product Detail</h1>
+    {% endif %}
+    <nav>
+      <ol class="breadcrumb">
+        {% set homepath = session.user_type ~ "." ~ session.user_type ~ "_dashboard"%}
+        <li class="breadcrumb-item"><a href="{{ url_for(homepath) }}">Home</a></li>
+        {% if product.subcategory_id == 1 %}
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.giftcard_list') }}">Giftcard Management</a></li>
+        {% else %}
+        <li class="breadcrumb-item"><a href="{{ url_for('internal.inventory_list') }}">Inventory</a></li>
+
+        {% endif %}
+        <li class="breadcrumb-item active">{{product.product_name}}</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+    <section class="section profile">
+
+
+      <div class="row">
+  
+        <div class="col-xl-8">
+  
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+  
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#product-overview" onclick="overviewTab()">Overview</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#product-edit" onclick="editTab()">Edit</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#product-image" onclick="imageTab()">More Images</button>
+                </li>
+  
+              </ul>
+              <div class="tab-content pt-2">
+  
+                <div class="tab-pane fade show active profile-overview" id="product-overview">
+  
+                  <h5 class="card-title">Product Details</h5>
+  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Name</div>
+                    <div class="col-lg-9 col-md-8">{{product.product_name}}</div>
+                  </div>
+  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Description</div>
+                    <div class="col-lg-9 col-md-8">{{product.product_description}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Category</div>
+                    <div class="col-lg-9 col-md-8">{{product.category_name}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Subcategory</div>
+                    <div class="col-lg-9 col-md-8">{{product.subcategory_name}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Price</div>
+                    <div class="col-lg-9 col-md-8">{{product.product_price}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Stock</div>
+                    <div class="col-lg-9 col-md-8">{{product.stock_quantity}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Oversized?</div>
+                    <div class="col-lg-9 col-md-8">{%if product.oversized ==1 %}Yes  {% elif  product.oversized ==2 %} Must Pick-up    {% else %}No{% endif %}</div>
+                  </div>
+  
+                </div>
+  
+                <div class="tab-pane fade product-edit pt-3" id="product-edit">
+  
+                  <!-- Product Edit Form -->
+                  {% if product.product_status %}
+                  <form action="{{url_for('internal.product_status', id = product.product_id, action = 'inactivate')}}" method="post">
+                    <input type="submit" style="left: 86%;position: relative;" class="btn btn-sm btn-danger float-right mb-2" value="Inactivate"/>
+                  {% else %}
+                  <form action="{{url_for('internal.product_status', id = product.product_id, action = 'activate')}}" method="post">
+                    <input type="submit" style="left: 86%;position: relative;" class="btn btn-sm btn-success float-right mb-2" value="Activate"/>
+                  {% endif %}
+                  </form>
+
+                  <form method="POST" enctype=multipart/form-data id="producteditform" action="{{ url_for('internal.product_detail', id = product.product_id)}}" >
+
+                    <div class="row mb-3">
+                      <label for="name" class="col-md-4 col-lg-3 col-form-label">Name</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="name" type="text" class="form-control" id="name" value="{{product.product_name}}"required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="description" class="col-md-4 col-lg-3 col-form-label">Description</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="description" class="form-control" id="description" rows="4" required>{{product.product_description}}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="price" class="col-md-4 col-lg-3 col-form-label">Price</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="price" type="number" class="form-control" id="price" value="{{product.product_price}}"required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="category" class="col-md-4 col-lg-3 col-form-label">Category</label>
+                      <div class="col-md-8 col-lg-9">
+                        <select name="category" class="form-control" id="subcatSelector" required>
+                          <option selected disabled>Choose from below</option>
+                          {% for category in allCategories %}
+                            <option value="{{category.category_id}}" data-bs-toggle="tab" data-bs-target="#{{category.category_id}}" {% if product.category_id == category.category_id %}selected{% endif %}>{{category.category_name}}</option>                          
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="quantity" class="col-md-4 col-lg-3 col-form-label">Quantity</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="quantity" type="number" step="1" class="form-control" id="quantity" value="{{product.stock_quantity}}" required>
+                      </div>
+                    </div>
+                    {% if product.subcategory_id != 1 %}
+                    <div class="row mb-3">
+                      <label for="oversized" class="col-md-4 col-lg-3 col-form-label">Oversized</label>
+                      <div class="col-md-8 col-lg-9">
+                       
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="0" {% if product.oversized == 0 %}checked{% endif %}>
+                          <label class="col-md-4" for="0">Standard</label>
+                        </div>
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="1" {% if product.oversized == 1 %}checked{% endif %}>
+                          <label class="col-md-4" for="1">Oversize</label>
+                        </div>
+                        <div class="row mb-3">
+                          <input type="radio" name="oversized" class="col-lg-1" value="2" {% if product.oversized == 2 %}checked{% endif %}>
+                          <label class="col-md-4" for="0">Too big, must pick-up</label>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </form>
+  
+                </div>
+
+
+
+                <!-- Edit images -->
+              
+                <div class="tab-pane fade product-edit pt-3" id="product-image">
+                  <div class="row">
+                    {% for image in images %}
+                    <div class="col-md-4 position-relative">
+                      <div class="card mb-3 {% if image.is_primary %}primary-image{% endif %}">
+                        <img src="/blueprints/static/product_image/{{ image.product_image }}" class="card-img-top img-fluid" style="max-height: 20vh; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 p-2">
+                          <div class="form-check">
+                            <input class="form-check-input visually-hidden" type="radio" name="primaryImage" id="primaryImage{{ image.product_image_id }}" value="{{ image.product_image_id }}" {% if image.is_primary %}checked{% endif %}>
+                            <label class="form-check-label" for="primaryImage{{ image.product_image_id }}">
+                              <span class="checkmark {% if image.is_primary %}checked{% endif %}"></span>
+                            </label>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <form method="POST" action="{{ url_for('internal.product_img_delete', productID=product.product_id, imageID=image.product_image_id) }}" class="mt-2">
+                            <button type="submit" class="btn btn-danger btn-sm w-100" title="Remove product image">
+                              <i class="bi bi-trash"></i> Remove
+                            </button>
+                          </form>
+                          <!-- Add a button to set this image as primary -->
+                          <form method="POST" action="{{ url_for('internal.setProductPrimaryImage', product_id = product.product_id) }}" class="mt-2">
+                            
+                            {% if image.product_image_id != product.product_image_id %}
+                            <input type="hidden" name="image_id" value="{{ image.product_image_id }}" id="image_id">
+                
+                            <button type="submit" class="btn btn-primary btn-sm w-100" title="Set as primary image">
+                              <i class="bi bi-check"></i> Set as Primary
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-primary btn-sm w-100" title="Set as primary image" disabled>
+                              <i class="bi bi-check"></i> Primary Image
+                            </button>
+                            {% endif %}
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </form>
+                <div class="card-body pt-3">
+                  <form method="POST" enctype="multipart/form-data" action="{{ url_for('internal.product_img_uploader', id=product.product_id) }}">
+                    <label for="imageUploader" class="">Upload image:</label>
+                    <input type="file" name="uploadedImages" multiple id="imageUploader" class="form-control mt-2" onchange="this.form.submit()">
+                  </form>
+                </div>
+                </div>
+
+
+              </div><!-- End Bordered Tabs -->
+  
+            </div>
+          </div>
+  
+        </div>
+
+
+        <div class="col-xl-4" ">
+  
+          <div class="card" id="imageCard">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+           
+              {% if product.product_image_id %}
+              {% for i in images %}
+              
+                    {% if product.product_image_id == i.product_image_id %}
+      
+                        <img src="/blueprints/static/product_image/{{ i.product_image }}" alt="Product" class="">
+                    {% endif %}
+                    {% endfor %}
+
+              {% else %}
+              
+              <img src="/blueprints/static/product_image/default-image.jpg" alt="Product" class="">
+              {% endif %}
+            
+              <h2>{{product.product_name}}</h2>
+              {% if product.product_status %}
+              <span class="badge bg-success text-white">Active</span>
+              {% else %}
+              <span class="badge bg-danger text-white">Inactive</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card" id="subcatCard" style="display:none;">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+  
+              <!-- Category Pane -->
+                <div class="tab-content mt02" id="typeTabContent">
+
+                  <div class="tab-pane fade " id="default"></div>
+
+                  {% for category in allCategories%}
+                  <div class="tab-pane fade type-category" id="{{category.category_id}}">
+                    <h4>Subcategory</h4>
+                    <h5>{{category.category_name}}</h5>
+                      
+                      {% for subcategory in allSubcategories %}
+                      {% if subcategory.category_id == category.category_id %}
+                      <div class="form-check">
+                        <div class="row">
+                          <input required form="producteditform" type="radio" class="col-lg-1" name="subcategory" value="{{subcategory.subcategory_id}}" id="{{subcategory.subcategory_name}}" {% if product.subcategory_id == subcategory.subcategory_id %}Checked{% endif %}>
+                          <label class="form-check-label col-lg-11" for="{{subcategory.subcategory_name}}">
+                            {{subcategory.subcategory_id}} - {{subcategory.subcategory_name}}
+                          </label>
+                        </div>
+                      </div>
+                      {% endif %}
+                      {% endfor %}
+
+                  </div>
+                  {% endfor %}
+
+              </div>  <!--End of subcat pane-->              
+            </div>
+            </div>
+          </div>
+  
+  
+        </div>
+
+
+      </div>
+    </section>
+</main><!-- End #main -->
+
+<ul class="nav nav-tabs d-none" id="typeTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="tab0-tab" data-toggle="tab" href="#default" role="tab" aria-controls="default" aria-selected="true">Tab 0</a>
+  </li>
+  {% for category in allCategories %}
+  <li class="nav-item">
+    <a class="nav-link " id="{{loop.index1}}-tab" data-toggle="tab" href="#{{category.category_id}}" role="tab" aria-controls="{{category.category_id}}" aria-selected="false">tab{{loop.index1}}</a>
+  </li>
+  {% endfor %}
+  
+</ul>
+
+<script>
+  $(document).ready(function(){
+    // Initialize Bootstrap tabs
+    $('#typeTab a').on('click', function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    var selectedTab = $('#subcatSelector').val();
+      $('#typeTab a[href="#' + selectedTab + '"]').tab('show');
+    
+    $('#subcatSelector').on('change', function(){
+      var selectedTab = $(this).val();
+      $('#typeTab a[href="#' + selectedTab + '"]').tab('show');
+    });
+    
+  });
+  function overviewTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'none';
+    imageCard.style.display = 'block';
+  }
+  function editTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'block';
+    imageCard.style.display = 'none';
+    
+  }
+
+  function imageTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'none';
+    imageCard.style.display = 'none';
+  }
+
+</script>
+
+{% endblock %}

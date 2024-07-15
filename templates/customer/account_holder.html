@@ -1,0 +1,324 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Apply for Account Holder
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="#">Apply for Account Holder</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Apply for the account holder</h2>
+            <p class="text-danger">Fields marked with <span class="text-danger">*</span> are required. Please ensure you select at least one checkbox under Account Information. If you select "Other", please specify in the provided field.</p>
+            <form method="POST" action="{{ url_for('customer.submit_account_holder_application') }}">
+                <!-- Account Information Section -->
+                <div class="mb-3">
+                    <h4 class="bg-success text-white p-2">ACCOUNT INFORMATION</h4>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="soleTrader" name="legalEntity" value="Sole Trader">
+                        <label class="form-check-label" for="soleTrader">Sole Trader</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="jointAccount" name="legalEntity" value="Joint A/C">
+                        <label class="form-check-label" for="jointAccount">Joint A/C</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="partnership" name="legalEntity" value="Partnership">
+                        <label class="form-check-label" for="partnership">Partnership</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="company" name="legalEntity" value="Company">
+                        <label class="form-check-label" for="company">Company</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="trust" name="legalEntity" value="Trust">
+                        <label class="form-check-label" for="trust">Trust (must provide a copy of your Trust Deed)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="otherEntity" name="legalEntity" value="Other">
+                        <label class="form-check-label" for="otherEntity">Other (please specify):</label>
+                        <input type="text" class="form-control" id="otherEntityDetails" name="otherEntityDetails">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountName">Account Name (legal entity):<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="accountName" name="accountName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tradingName">Trading Name (if different):</label>
+                        <input type="text" class="form-control" id="tradingName" name="tradingName">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyNumber">Company Number:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="companyNumber" name="companyNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gstNumber">GST Number:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="gstNumber" name="gstNumber" required>
+                    </div>
+                </div>
+
+                <!-- Address Section -->
+                <div class="mb-3">
+                    <h4 class="bg-success text-white p-2">ADDRESS</h4>
+                    <h5>POSTAL ADDRESS:</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="postalNumber">Number:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalNumber" name="postalNumber" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="postalStreet">Street Name:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalStreet" name="postalStreet" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="postalSuburb">Suburb:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalSuburb" name="postalSuburb" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="postalCity">City:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalCity" name="postalCity" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="postalProvince">Province:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalProvince" name="postalProvince" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="postalPostcode">Postcode:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="postalPostcode" name="postalPostcode" required>
+                        </div>
+                    </div>
+
+                    <!-- Residential Address -->
+                    <h5>RESIDENTIAL ADDRESS: (if different from above)</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="residentialNumber">Number:</label>
+                            <input type="text" class="form-control" id="residentialNumber" name="residentialNumber">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="residentialStreet">Street Name:</label>
+                            <input type="text" class="form-control" id="residentialStreet" name="residentialStreet">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="residentialSuburb">Suburb:</label>
+                            <input type="text" class="form-control" id="residentialSuburb" name="residentialSuburb">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="residentialCity">City:</label>
+                            <input type="text" class="form-control" id="residentialCity" name="residentialCity">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="residentialProvince">Province:</label>
+                            <input type="text" class="form-control" id="residentialProvince" name="residentialProvince">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="residentialPostcode">Postcode:</label>
+                            <input type="text" class="form-control" id="residentialPostcode" name="residentialPostcode">
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <h5>DELIVERY ADDRESS: (if different from above)</h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="deliveryNumber">Number:</label>
+                            <input type="text" class="form-control" id="deliveryNumber" name="deliveryNumber">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="deliveryStreet">Street Name:</label>
+                            <input type="text" class="form-control" id="deliveryStreet" name="deliveryStreet">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="deliverySuburb">Suburb:</label>
+                            <input type="text" class="form-control" id="deliverySuburb" name="deliverySuburb">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="deliveryCity">City:</label>
+                            <input type="text" class="form-control" id="deliveryCity" name="deliveryCity">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="deliveryProvince">Province:</label>
+                            <input type="text" class="form-control" id="deliveryProvince" name="deliveryProvince">
+                        </div>
+                        <div class="
+
+form-group col-md-4">
+                            <label for="deliveryPostcode">Postcode:</label>
+                            <input type="text" class="form-control" id="deliveryPostcode" name="deliveryPostcode">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information for Your Account Section -->
+                <div class="mb-3">
+                    <h4 class="bg-success text-white p-2">CONTACT INFORMATION FOR YOUR ACCOUNT</h4>
+                    <div class="form-group">
+                        <label for="primaryContactName">Full Name (Primary Contact):<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="primaryContactName" name="primaryContactName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactRelationship">Relationship to Account (e.g. director, trustee, farm manager):<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="primaryContactRelationship" name="primaryContactRelationship" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactDOB">Date of Birth:<span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="primaryContactDOB" name="primaryContactDOB" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactPostalAddress">Postal Address:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="primaryContactPostalAddress" name="primaryContactPostalAddress" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="primaryContactHomePhone">Home Phone:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="primaryContactHomePhone" name="primaryContactHomePhone" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="primaryContactMobile">Mobile:<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="primaryContactMobile" name="primaryContactMobile" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactEmail">Email:<span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="primaryContactEmail" name="primaryContactEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactID">Driver's Licence/Passport No.:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="primaryContactID" name="primaryContactID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryContactSignature">Signature:<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="primaryContactSignature" name="primaryContactSignature" required>
+                    </div>
+
+                    <!-- Additional Contact Information -->
+                    <h4 class="bg-success text-white p-2">ADDITIONAL CONTACT INFORMATION</h4>
+                    <div class="form-group">
+                        <label for="additionalContactName">Full Name:</label>
+                        <input type="text" class="form-control" id="additionalContactName" name="additionalContactName">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactRelationship">Relationship to Account (e.g. director, trustee, farm manager):</label>
+                        <input type="text" class="form-control" id="additionalContactRelationship" name="additionalContactRelationship">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactDOB">Date of Birth:</label>
+                        <input type="date" class="form-control" id="additionalContactDOB" name="additionalContactDOB">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactPostalAddress">Postal Address:</label>
+                        <input type="text" class="form-control" id="additionalContactPostalAddress" name="additionalContactPostalAddress">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="additionalContactHomePhone">Home Phone:</label>
+                            <input type="text" class="form-control" id="additionalContactHomePhone" name="additionalContactHomePhone">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="additionalContactMobile">Mobile:</label>
+                            <input type="text" class="form-control" id="additionalContactMobile" name="additionalContactMobile">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactEmail">Email:</label>
+                        <input type="email" class="form-control" id="additionalContactEmail" name="additionalContactEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactID">Driver's Licence/Passport No.:</label>
+                        <input type="text" class="form-control" id="additionalContactID" name="additionalContactID">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalContactSignature">Signature:</label>
+                        <input type="text" class="form-control" id="additionalContactSignature" name="additionalContactSignature">
+                    </div>
+                </div>
+                <div class="mb-3 row align-items-center">
+                    <div class="col-md-4">
+                        <label for="monthlyLimit" class="form-label">Monthly Limit</label>
+                    </div>
+                    <div class="col-md-8">
+                        <select class="form-control" id="monthlyLimit" name="monthlyLimit" required>
+                            <option value="1000">1000</option>
+                            <option value="3000">3000</option>
+                            <option value="5000">5000</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="mb-4"><strong>I/we on behalf of the applicant(s) and if applicable as Guarantor acknowledge and declare that:</strong></p>
+                            <ol>
+                                <li class="mb-3">the information provided to Moa and given in this application is true and correct;</li>
+                                <li class="mb-3">I/we have read the Moa Limited Terms and Conditions attached to this application and agree to be bound by them (and any variation);</li>
+                                <li class="mb-3">I/we irrevocably authorise Moa to make enquiries as it considers appropriate (including the credit reference agencies, bankers, solicitors, insurers and accountants), and to provide information to any third party for the purpose of carrying out credit checks, obtaining credit reports or debt collection which may then be held and used by that third party and used for its credit reporting purposes. Such third parties include but are not limited to: xxx Limited, Private Bag 92156, Auckland Mail Centre, Auckland 1142;</li>
+                                <li class="mb-3">I/we understand and acknowledge that Carrfields may reject this application and is not required to provide a reason. This includes where I/we do not provide the information requested by Carrfields or refuse to grant Carrfields the authority to obtain information about me/us in accordance with (c) and the Terms and Conditions.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="acceptTerms" name="acceptTerms" required>
+                    <label class="form-check-label" for="acceptTerms">I accept all terms and conditions.</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Application</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkboxes = document.querySelectorAll('input[name="legalEntity"]');
+        var otherEntityDetails = document.getElementById('otherEntityDetails');
+        otherEntityDetails.disabled = true;
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                var isChecked = false;
+                checkboxes.forEach(function (box) {
+                    if (box.checked) isChecked = true;
+                });
+
+                // Make the otherEntityDetails field required if 'Other' is checked
+                if (document.getElementById('otherEntity').checked) {
+                    otherEntityDetails.disabled = false;
+                    otherEntityDetails.required = true;
+                } else {
+                    otherEntityDetails.disabled = true;
+                    otherEntityDetails.required = false;
+                }
+
+                // Ensure at least one checkbox is checked
+                if (isChecked) {
+                    checkboxes.forEach(function (box) {
+                        box.removeAttribute('required');
+                    });
+                } else {
+                    checkboxes.forEach(function (box) {
+                        box.setAttribute('required', 'required');
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

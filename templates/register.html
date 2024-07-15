@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Kodinger">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>My Register Page</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='registration/css/my-login.css') }}">
+</head>
+<body class="my-login-page">
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-md-center h-100">
+				<div class="card-wrapper">
+					<div class="brand">
+						<a href="{{ url_for('common.home') }}"><img src="{{ url_for('static', filename='registration/img/logo.jpg') }}" alt="logo"></a>
+					</div>
+					<div class="card fat">
+						<div class="card-body">
+							<h4 class="card-title">Register</h4>
+							 <!-- Flash Messages -->
+							<div class="container_flash">
+
+								{% with messages = get_flashed_messages() %}
+									{% if messages %}
+										<div id="flash_msgs" class="alert alert-warning" role="alert">
+										<i class="bi bi-check-circle-fill"></i>
+											{% for message in messages %}
+													{{ message}}
+											{% endfor %}
+										</div>
+									{% endif %}
+								{% endwith %}
+							</div>
+							<form method="POST"  class="my-login-validation" novalidate action="{{ url_for('user.register')}}" onsubmit="return validatePassword()">
+								<div class="form-group">
+									<label for="email">Email Address</label>
+									<input id="email" type="email" class="form-control" name="email" pattern="[^ @]*@[^ @]*"  oninput="checkEmail()" maxlength="50" required>
+									<span id="check_email" class="form-text" style="color:red;"></span>
+									<div class="invalid-feedback">
+										Your email is invalid
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="password">Password</label>
+									<input id="password" type="password" class="form-control" name="password" required minlength="8" maxlength="15" data-eye>
+									<div class="invalid-feedback">
+										Password is required
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="confirm_password">Confirm Password</label>
+									<input id="confirm_password" type="password" class="form-control" name="confirm_password" required minlength="8" maxlength="15">
+									<div class="invalid-feedback">
+										Password does not match
+									</div>
+								</div>
+
+								<div id="passwordError" class="error-message" style="color: red;"></div><br>
+
+								<div class="form-group">
+									<div class="custom-checkbox custom-control">
+										<input type="checkbox" name="agree" id="agree" class="custom-control-input" required="">
+										<label for="agree" class="custom-control-label">I agree to the <a href="#" id="openTermsModal">Terms and Conditions</a></label>
+										<div class="invalid-feedback">
+											You must agree with our Terms and Conditions
+										</div>
+									</div>
+								</div>
+							
+								<div class="form-group m-0">
+									<button type="submit" class="btn btn-success btn-block" value="register" id="submitButton">
+										Register
+									</button>
+								</div>
+								<div class="mt-4 text-center">
+									Already have an account? <a href="{{ url_for('user.login') }}">Login</a>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="footer">
+						Copyright &copy; 2024 &mdash; Group AR2
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div id="termsModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="margin: 5% auto; padding: 40px; border: 1px solid #888; width: 60%; max-width: 800px;">
+        <span class="close" style="float: right; font-size: 28px; font-weight: bold;">&times;</span>
+        <h2>Terms and Conditions</h2>
+			<p>Welcome to Moa Creek Rural Supplies. By using our website, you agree to these terms. Please read them carefully.</p>
+			<ol>
+				<li><strong>Use of the Website</strong>
+					<ul>
+						You agree to provide accurate information when making purchases.
+						You agree not to misuse our website.
+					</ul>
+				</li>
+				<li><strong>Privacy</strong>
+					<ul>
+						Your privacy is important to us. Please review our Privacy Policy to understand how we collect and use your information.
+					</ul>
+				</li>
+				<li><strong>Liability</strong>
+					<ul>
+						We are not liable for any damages resulting from your use of our website.
+					</ul>
+				</li>
+				<li><strong>Changes to Terms</strong>
+					<ul>
+						We may update these terms from time to time. By continuing to use our website, you agree to the updated terms.
+					</ul>
+				</li>
+				<li><strong>Contact Us</strong>
+					<ul>
+						If you have any questions about these terms, please contact us at support@moacreek.com.
+					</ul>
+				</li>
+			</ol>
+		</div>
+	</div>
+	
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="{{ url_for('static', filename='registration/js/my-login.js') }}"></script>
+
+
+</body>
+</html>
+

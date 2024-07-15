@@ -1,0 +1,197 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies Manager - New Promotion{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Promotions</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_dashboard') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_promotion_management') }}">Promotion List</a></li>
+          <li class="breadcrumb-item active">New promotion</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <form method="POST" action="{{ url_for('manager.promotion_new' )}}" >
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body pt-3">
+                <div class="row mb-3">
+                  <label for="name" class="col-md-4 col-lg-3 col-form-label">Promotion Name</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="name" type="text" class="form-control" id="name" required>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="description" class="col-md-4 col-lg-3 col-form-label">Promotion Description</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="description" class="form-control" id="description" rows="4" required></textarea>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="type" class="col-md-4 col-lg-3 col-form-label">Type</label>
+                  <div class="col-md-8 col-lg-9">
+                    <select name="type" class="form-control" id="tabSelector" required>
+                      <option selected disabled>Choose from below</option>
+                      <option value="category" data-bs-toggle="tab" data-bs-target="#type-category">Category</option>
+                      <option value="subcategory" data-bs-toggle="tab" data-bs-target="#type-subcategory">Subcategory</option>
+                      <option value="product" data-bs-toggle="tab" data-bs-target="#type-product">Product</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="discount_type" class="col-md-4 col-lg-3 col-form-label">Discount Type</label>
+                  <div class="col-md-8 col-lg-9">
+                    <select name="discount_type" class="form-control" id="discount-type" required>
+                      <option selected disabled>Choose from below</option>
+                      <option value="buyOneGetOneFree">Buy One Get One Free</option>
+                      <option value="rate">Fixed Rate</option>
+                  </div>
+                </div>
+
+                <div class="row mb-3" id="discount-field">
+                  <label for="discount" class="col-md-4 col-lg-3 col-form-label">Discount (%)</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="discount" type="text" class="form-control" id="discount" required>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="start_date" class="col-md-4 col-lg-3 col-form-label">Start Date</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="start_date" type="datetime-local" class="form-control" id="start_date" required>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="end_date" class="col-md-4 col-lg-3 col-form-label">End Date</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="end_date" type="datetime-local" class="form-control" id="end_date" required>
+                  </div>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Pane -->
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body pt-3">
+                <div class="tab-content mt02" id="typeTabContent">
+
+                  <div class="tab-pane fade " id="default"></div>
+
+                  <div class="tab-pane fade type-category" id="category">
+                    <h5>Categories</h5>
+                    <div class="col-sm-10">
+                      
+                      {% for category in allCategories %}
+                      <div class="form-check">
+                        <input class="form-check-input" name="categoryChecked" type="checkbox" value="{{category.category_id}}" id="{{category.category_id}}">
+                        <label class="form-check-label" for="{{category.category_id}}">
+                          {{category.category_id}} - {{category.category_name}}
+                        </label>
+                      </div>
+                      {% endfor %}
+
+                    </div>
+                  </div>
+
+                  <div class="tab-pane fade type-subcategory" id="subcategory">
+                    <h5>Subcategories</h5>
+                    <div class="col-sm-10">
+                      
+                      {% for subcategory in allSubcategories %}
+                        <div class="form-check">
+                          <input class="form-check-input" name="subcategoryChecked" type="checkbox" value="{{subcategory.subcategory_id}}" id="{{subcategory.subcategory_id}}" >
+                          <label class="form-check-label" for="{{subcategory.subcategory_id}}">
+                            {{subcategory.subcategory_id}} - {{subcategory.subcategory_name}}
+                          </label>
+                        </div>
+                      {% endfor %}
+
+                    </div>
+                  </div>
+                    
+                  <div class="tab-pane fade type-product" id="product">
+                    <h5>Products</h5>
+                    <div class="col-sm-10">
+                      
+                      {% for product in allProducts %}
+                          <div class="form-check">
+                            <input class="form-check-input" name="productChecked" type="checkbox" value="{{product.product_id}}" id="{{product.product_id}}">
+                            <label class="form-check-label" for="{{product.product_id}}">
+                              {{product.product_id}} - {{product.product_name}}
+                            </label>
+                          </div>
+                          {% endfor %}
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>                
+        </div>
+      </form>
+    </section>
+
+</main><!-- End #main -->
+
+<ul class="nav nav-tabs d-none" id="typeTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="tab3-tab" data-toggle="tab" href="#default" role="tab" aria-controls="default" aria-selected="true">Tab 3</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link " id="tab1-tab" data-toggle="tab" href="#category" role="tab" aria-controls="category" aria-selected="false">Tab 1</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="tab2-tab" data-toggle="tab" href="#subcategory" role="tab" aria-controls="subcategory" aria-selected="false">Tab 2</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="tab3-tab" data-toggle="tab" href="#product" role="tab" aria-controls="product" aria-selected="false">Tab 3</a>
+  </li>
+  
+</ul>
+
+<script>
+  $(document).ready(function(){
+    // Initialize Bootstrap tabs
+    $('#typeTab a').on('click', function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    
+    // Handle tab selection from dropdown
+    $('#tabSelector').on('change', function(){
+      var selectedTab = $(this).val();
+      $('#typeTab a[href="#' + selectedTab + '"]').tab('show');
+    });
+
+    $('#discount-type').on('change', function(){
+      if ($(this).find(":selected").val() == 'buyOneGetOneFree') {
+        $('#discount').hide().removeAttr('required');
+      } else {
+        $('#discount').show().prop('required', 'required');
+      }
+    });
+  });
+</script>
+
+{% endblock %}

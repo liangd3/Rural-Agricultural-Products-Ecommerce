@@ -1,0 +1,69 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Orders
+{% endblock %}
+{% block content %}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="bread-inner">
+                    <ul class="bread-list">
+                        <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                        <li class="active"><a href="#">My Orders</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="section"> 
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-main">
+                    <div class="title">
+                        <!-- Bordered Tabs -->
+                        <div class="pagetitle">
+                            <h4>My Orders</h4>
+                        </div><!-- End Page Title -->
+                        <div class="table-responsive">
+                            <table class="table table-hover datatable">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Payments</th>
+                                        <th>Order Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.order_id }}</td>
+                                        <td>{{ order.order_date|nzdate }}</td>
+                                        <td>{{ order.total_amount }}</td>
+                                        <td>{{ order.order_status }}</td>
+                                        {% if not order.payment_id or order.payment_type_name == 'Account Balance'%}
+                                        <td><a href="{{ url_for('customer.customer_pay_order', id = order.order_id) }}" style="color: darkorange; font-weight: bold; text-decoration: underline; cursor: pointer;">Pay Now</a></td>
+                                        {% else %}
+                                        <td> {{ order.payment_type_name }}  </td>
+                                        {% endif %}
+                                        <td><a href="{{ url_for('customer.customer_order_details', id = order.order_id) }}" style="color: white; background-color: orange; text-decoration: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Detail</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

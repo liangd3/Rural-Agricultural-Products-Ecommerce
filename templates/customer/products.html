@@ -1,0 +1,217 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+
+{% block css %}
+<!-- Jquery Ui -->
+<link rel="stylesheet" href="{{ url_for('static', filename='customer/css/jquery-ui.css') }}">
+{% endblock %}
+	
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="bread-inner">
+					<ul class="bread-list">
+						<li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+						<li class="active">Products</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End Breadcrumbs -->
+
+	<!-- Start Product Area -->
+	<div class="product-area section" id="products">
+		<div class="container-md">
+			<div class="row">
+				<div class="col-12">
+					<div class="section-title">
+						<h2>Our Products</h2>
+						<p style="color: red;">* All our products prices are GST inclusive<br> Contact us for NZ outer islands delivery</p>							
+					</div>						
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="product-info">
+						<div class="nav-main">
+							<!-- Tab Nav -->
+							{% if not nav_bar_redirect %}
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								
+								<li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#all" role="tab">All</a></li>
+								{% for subcategory in subcategories %}
+								<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#{{subcategory.subcategory_id}}" role="tab">{{subcategory.subcategory_name}}</a></li>
+								{% endfor %}
+								<li class="nav-item"><a class="nav-link" href="{{ url_for('customer.customer_promotions') }}">On Sale</a></li>
+
+							</ul>
+							<!--/ End Tab Nav -->
+							{% else %}
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								
+								<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#" onclick="customet_all_products()"  role="tab">All</a></li>
+								{% for subcategory in subcategories %}
+								<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#" onclick="all_products({{ subcategory.subcategory_id }})"  role="tab">{{subcategory.subcategory_name}}</a></li>
+								{% endfor %}
+
+							</ul>
+
+							{% endif %}
+
+
+
+
+						</div>
+						<div class="tab-content" id="myTabContent">
+							<!-- Start Single Tab -->
+							<div class="tab-pane fade show active" id="all" role="tabpanel">
+								<div class="tab-single">
+									<div class="row">
+										{% for product in products %}
+										<div class="col-xl-3 col-lg-4 col-md-4 col-12">
+											<div class="single-product">
+												<div class="product-img">
+													<a href="{{ url_for('customer.customer_products', id=product.product_id) }}">
+														
+														{% if product.product_image_id %}
+														<img class="default-img" src="/blueprints/static/product_image/{{product.product_image}}" alt="{{product.product_image}}" loading="lazy">
+														{% if product.discounted_price %}
+														<span class="special-icon">Special</span>
+														{% endif %}
+														{% else %}
+														
+														<img class="default-img" src="/blueprints/static/product_image/default-image.jpg" alt="{{default-image.jpg}}" loading="lazy">
+														{% if product.discounted_price %}
+														<span class="special-icon">Special</span>
+														{% endif %}
+
+														{% endif %}
+												
+													</a>
+													<div class="button-head">
+														<div class="product-action-2">
+															<a title="Add to cart" onclick="addToCart('{{product.product_name}}',{{product.product_id}}, 1)">Add to cart</a>
+														</div>
+													</div>
+												</div>
+												<div class="product-content">
+													<h3><a href="{{ url_for('customer.customer_products', id=product.product_id) }}">{{product.product_name}}</a></h3>
+													<div class="product-price">
+														{% if product.discounted_price == "buyOneGetOneFree" %}
+														<span class="text-decoration-line-through">${{product.product_price}}</span>
+														<h5 class="text-danger">Buy One Get One FREE</h5>
+														{% elif product.discounted_price %}
+														<span class="text-decoration-line-through">${{product.product_price}}</span>
+														<h3 class="text-danger">${{product.discounted_price}}</h3>
+														{% else %}
+														<span>${{product.product_price}}</span>
+														{% endif %}
+														
+													</div>
+													
+												</div>
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+							<!--/ End Single Tab -->
+							<!-- Start Single Tab -->
+							{% for subcategory in subcategories %}
+							<div class="tab-pane fade" id="{{subcategory.subcategory_id}}" role="tabpanel">
+								<div class="tab-single">
+									<div class="row">
+										{% for product in products %}
+										{% if subcategory.subcategory_id == product.subcategory_id %}
+										<div class="col-xl-3 col-lg-4 col-md-4 col-12">
+											<div class="single-product">
+												<div class="product-img">
+													<a href="{{ url_for('customer.customer_products', id=product.product_id) }}">
+														{% if product.product_image_id %}
+														<img class="default-img" src="/blueprints/static/product_image/{{product.product_image}}" alt="{{product.product_image}}" loading="lazy">
+														{% if product.discounted_price %}
+														<span class="special-icon">Special</span>
+														{% endif %}
+														{% else %}
+														<img class="default-img" src="/blueprints/static/product_image/default-image.jpg" alt="{{default-image.jpg}}" loading="lazy">												
+														{% if product.discounted_price %}
+														<span class="special-icon">Special</span>
+														{% endif %}
+														{% endif %}
+													</a>
+													<div class="button-head">
+													
+														<div class="product-action-2">
+															<a title="Add to cart" onclick="addToCart('{{product.product_name}}',{{product.product_id}}, 1)">Add to cart</a>
+														</div>
+													</div>
+												</div>
+												<div class="product-content">
+													<h3><a href="{{ url_for('customer.customer_products', id=product.product_id) }}">{{product.product_name}}</a></h3>
+													<div class="product-price">
+														{% if product.discounted_price %}
+														<span class="text-decoration-line-through">${{product.product_price}}</span>
+														<h3 class="text-danger">${{product.discounted_price}}</h3>
+														{% else %}
+														<span>${{product.product_price}}</span>
+														{% endif %}
+														
+													</div>
+												
+												</div>
+											</div>
+										</div>
+										{% endif %}
+										{% endfor %}		
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							<!--/ End Single Tab -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!-- End Product Area -->
+<script>
+
+
+
+function all_products(subcategoryId) {
+    var url;
+   
+    url = "{{ url_for('customer.all_products') }}?subcategory=" + subcategoryId;
+   
+    window.location.href = url;
+
+
+
+}
+
+
+function customet_all_products() {
+    var url;
+ 
+    url = "{{ url_for('customer.all_products') }}";
+    
+    window.location.href = url;
+}
+</script>
+	
+{% block js %} 
+<!-- Fancybox JS -->
+<script src="{{ url_for('static', filename='customer/js/facnybox.min.js') }}"></script>
+<!-- Ytplayer JS -->
+<script src="{{ url_for('static', filename='customer/js/ytplayer.min.js') }}"></script>
+
+{% endblock%}
+
+{% endblock %}

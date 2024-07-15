@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>{% block title %}{% endblock %}</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='staff/img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='staff/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- jQuery CDN -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='staff/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/quill/quill.snow.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='staff/vendor/simple-datatables/style.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static', filename='staff/css/style.css') }}" rel="stylesheet">
+
+  {% block css %}{% endblock %}
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('common.home') }}" class="logo d-flex align-items-center">
+        <img src="{{ url_for('static', filename='staff/img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">Staff Dashboard</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li><!-- End Search Icon-->
+
+        <li class="nav-item dropdown">
+
+          <a class="nav-link nav-icon" href="{{ url_for('internal.get_messages_lv1') }}">
+            <i class="bi bi-chat-left-text"></i>
+            <span class="badge bg-warning badge-number">..</span>
+          </a><!-- End Messages Icon -->
+
+        </li><!-- End Messages Nav -->
+
+        <li class="nav-item dropdown pe-3">
+
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            <img src="/blueprints/static/profile_image/{{session.profile_image}}" alt="Profile" class="rounded-circle" style="width:36px;">
+            <span class="d-none d-md-block dropdown-toggle ps-2">{{session.first_name}} {{session.last_name}} </span>
+          </a><!-- End Profile Iamge Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{session.first_name}} {{session.last_name}}</h6>
+              <span>Staff ID: {{session.user_id}}</span>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('staff.staff_profile') }}">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.logout') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('staff.staff_dashboard') }}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <hr class="dropdown-divider">
+      </li>
+      <li class="nav-heading">Management</li>
+    
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{url_for('internal.editDiscount')}}">
+          <i class="bi bi-currency-dollar"></i><span>Edit Discounts</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('internal.orderManagement') }}">
+          <i class="bi bi-cart-check"></i><span>Order Management</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed"  href="{{url_for('internal.inventory_list', role = 'staff')}}">
+          <i class="bi bi-table"></i><span>Product Management</span>
+        </a>
+      </li>
+
+      <li class="nav-heading">Account</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('staff.staff_profile') }}">
+          <i class="bi bi-person"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{{ url_for('internal.get_messages_lv1') }}">
+          <i class="bi bi-envelope"></i><span>My Inbox</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ url_for('user.logout') }}">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Log Out</span>
+        </a>
+      </li>
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  {% block content %}{% endblock %}
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright © 2024 <strong><span>Moa Creek Rural Supplies</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      Designed by Group AR2
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='staff/vendor/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/chart.js/chart.umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/echarts/echarts.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/quill/quill.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='staff/vendor/php-email-form/validate.js') }}"></script>
+
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', filename='staff/js/main.js') }}"></script>
+  <!-- Toasts Container -->
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
+      <!-- Toasts will be added here dynamically -->
+    </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var messages = JSON.parse('{{ get_flashed_messages(with_categories=true) | tojson | safe }}');
+    var toastContainer = document.getElementById('toastContainer');
+  
+    messages.forEach(function(message) {
+      var category = message[0], content = message[1];
+      // Define background classes based on message category
+      var bgClass = category === 'success' ? 'bg-success text-white' : 
+                    category === 'danger' ? 'bg-danger text-white' : 
+                    category === 'warning' ? 'bg-warning' : 
+                    'bg-primary text-white'; // Default case
+  
+      var toastHtml = `
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+          <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body ${bgClass}">
+            ${content}
+          </div>
+        </div>
+      `;
+  
+      toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    });
+  
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function(toastEl) {
+      return new bootstrap.Toast(toastEl).show();
+    });
+  });
+  </script> <!---End toast-->   
+
+  {% block js %} {% endblock %}
+</body>
+
+</html>

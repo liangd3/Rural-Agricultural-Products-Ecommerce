@@ -1,0 +1,125 @@
+{% extends 'staff/staff_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Staff {% endblock %}
+{% block content %}
+
+
+
+<main id="main" class="main"> 
+  <div class="pagetitle">
+    <h1>Staff Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('staff.staff_dashboard') }}">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+      <div class="col-lg-10">
+        <div class="row">
+          <!-- Products -->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card products-card">
+              <div class="card-body">
+                <h5 class="card-title">Products <span>| Total</span></h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" >
+                    <i class="bi bi-table"></i>
+                  </div>
+                  <div class="ps-3">
+                    <a href="{{url_for('internal.inventory_list', role = 'staff')}}">
+                      <h6>{{ product_count }}</h6>
+                      <span class="text-success small pt-1 fw-bold">{{ active_product_count }}</span> <span class="text-muted small pt-2 ps-1">Active</span>
+                      <span class="text-danger small pt-1 fw-bold">{{ inactive_product_count }}</span> <span class="text-muted small pt-2 ps-1">Inactive</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Products -->
+
+          <!-- Orders -->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card orders-card">
+              <div class="card-body">
+                <h5 class="card-title">Orders <span>| This Month</span></h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-cart-check"></i>
+                  </div>
+                  <div class="ps-3">
+                    <a href="{{ url_for('internal.orderManagement') }}">
+                      <h6>{{this_month_order_count}}</h6>
+                      <span class="text-success small pt-1 fw-bold">{{last_month_order_count}}</span> <span class="text-muted small pt-2 ps-1">Last Month</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Orders -->
+
+          <!-- Inbox -->
+          <div class="col-xxl-4 col-xl-12">
+            <div class="card info-card inbox-card">
+              <div class="card-body">
+                <h5 class="card-title">Inbox <span>| New Message</span></h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-envelope-exclamation"></i>
+                  </div>
+                  <div class="ps-3">
+                    <a href="{{ url_for('internal.get_messages_lv1') }}">
+                      <h6>{{new_message_count}}</h6>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Inbox -->
+
+          <!-- Orders -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+              <div class="card-body">
+                <h5 class="card-title">Orders <span>| Current</span></h5>
+                  <table class="table table-borderless datatable">
+                    <thead>
+                      <tr>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Shipping Method</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Order Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for o in orders %}
+                        <tr>
+                          <th scope="row"><a href="{{ url_for('internal.orderDetails', id = o.order_id) }}" >{{ o.order_id }}  </a></th>
+                          <td>{{ o.shipping_name }}</td>
+                          <td><span style="font-size: 0px">{{o.order_date}}</span>{{ o.order_date |nzdate}}</td>
+                          {% if o.order_status  == 'pending' %}
+                            <td><span class="badge bg-danger"> {{ o.order_status }}</span></td>
+                          {% elif o.order_status  == 'preparing' %}
+                            <td><span class="badge bg-info"> {{ o.order_status }}</span></td>
+                          {% elif o.order_status  == 'ready' %}
+                            <td><span class="badge bg-warning"> {{ o.order_status }}</span></td>
+                          {% elif o.order_status  == 'finished' %}
+                            <td><span class="badge bg-success"> {{ o.order_status }}</span></td>
+                          {% elif o.order_status  == 'placed' %}
+                            <td><span class="badge bg-primary"> {{ o.order_status }}</span></td>
+                          {% endif %}
+                        </tr>
+                      {%endfor%}
+                    </tbody>
+                  </table>
+              </div>
+            </div>
+          </div><!-- End Orders -->
+        </div>
+      </div>
+  </section>
+
+</main><!-- End #main -->
+
+{% endblock %}

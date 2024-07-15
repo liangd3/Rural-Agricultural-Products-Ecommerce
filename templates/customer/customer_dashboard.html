@@ -1,0 +1,378 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+
+
+
+	<!-- Slider Area -->
+	<section class="hero-slider">
+		<!-- Single Slider -->
+		<div class="single-slider">
+			<div class="container-fluid">			
+				<!-- Carousel -->
+				<div id="demo" class="carousel slide" data-bs-ride="carousel">
+					<!-- Indicators/dots -->
+					<div class="carousel-indicators">
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+					{% for promotion in promotions %}
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="{{ loop.index }}" ></button>
+					{% endfor %}
+					</div>
+
+					<!-- The slideshow/carousel -->
+					<div class="carousel-inner">
+						<div class="carousel-item active">
+							<img src="/static/promotion_image/New Zealand's Rural Excellence.jpeg" alt="promotion_image" class="d-block w-100" loading="lazy">
+							<div class="carousel-caption">
+								<div class="hero-text">
+									<h1><span>UP TO 50% OFF </span>New Zealand's Rural Excellence</h1>
+									<p>Visit our website to explore <br> our full range of premium<br> rural agricultural products. </p>
+									<div class="button">
+										<a href="{{ url_for('customer.customer_promotions') }}" class="btn">Shop Now!</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% for promotion in promotions %}
+						<div class="carousel-item">
+							<img src="/static/promotion_image/{{promotion.promotion_image}}" alt="{{promotion.promotion_name}}" class="d-block w-100" loading="lazy">
+							<div class="carousel-caption">
+								<div class="hero-text">
+									<h1><span>UP TO 50% OFF </span>{{promotion.promotion_name}}</h1>
+									{% set words = promotion.promotion_description.split() %}
+									<p>{{ ' '.join(words[:3]) }} <br> {{ ' '.join(words[3:]) }} </p>
+									{% if promotion.status != 'Active' %}
+									<p style="color: orange;">Coming Soon </p>
+									{%endif%}
+									<div class="button">
+										<a href="{{ url_for('customer.customer_promotions') }}" class="btn">Shop Now!</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				
+					<!-- Left and right controls/icons -->
+					<button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon"></span>
+					</button>
+					<button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+					<span class="carousel-control-next-icon"></span>
+					</button>
+				</div>
+			</div>					
+		</div>
+		<!--/ End Single Slider -->
+	</section>
+	<!--/ End Slider Area -->
+	
+	<!-- Start Small Banner  -->
+	<section class="small-banner section">
+		<div class="container-fluid">
+			<div class="row">
+				<!-- Single Banner  -->
+				<div class="col-lg-4 col-md-6 col-12">
+					<div class="single-banner">
+						<img src="/static/customer/images/machinary-collections.png" alt="machinary-collections" loading="lazy">
+						<div class="content">
+							<p>Machinaries Highlight</p>
+							<h3> Farm <br> Machinaries <br> 2024</h3>
+							<a href="{{ url_for('customer.all_products') }}">Shop Now</a>
+						</div>
+					</div>
+				</div>
+				<!-- /End Single Banner  -->
+				<!-- Single Banner  -->
+				<div class="col-lg-4 col-md-6 col-12">
+					<div class="single-banner">
+						<img src="/static/customer/images/animal-collections.png" alt="animal-collections" loading="lazy">
+						<div class="content">
+							<p>Animals Collectons</p>
+							<h3>Summer <br> collection</h3>
+							<a href="{{ url_for('customer.all_products') }}">Discover Now</a>
+						</div>
+					</div>
+				</div>
+				<!-- /End Single Banner  -->
+				<!-- Single Banner  -->
+				<div class="col-lg-4 col-12">
+					<div class="single-banner tab-height">
+						<img src="/static/customer/images/tank-collections.png" alt="tank-collections" loading="lazy">
+						<div class="content">
+							<p>Tanks Sale</p>
+							<h3>Mid Season <br> Up to <span>40%</span> Off</h3>
+							<a href="{{ url_for('customer.all_products') }}">Discover Now</a>
+						</div>
+					</div>
+				</div>
+				<!-- /End Single Banner  -->
+			</div>
+		</div>
+	</section>
+	<!-- End Small Banner -->
+	
+	<!-- Start Most Popular -->
+	<div class="product-area most-popular section">
+        <div class="container">
+            <div class="row">
+				<div class="col-12">
+					<div class="section-title">
+						<div class="title-container" style="display: flex; justify-content: space-between; align-items: center;">
+							<h2 style="flex: 1; text-align: center;">Hot Items</h2>
+							<div class="custom-button-container" style="margin-left: auto;">
+								<a href="{{ url_for('customer.all_products') }}" class="btn custom-color">Shop All</a>
+							</div>
+						</div>	
+					</div>
+				</div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="owl-carousel owl-theme popular-slider">
+						<!-- Start Single Product -->
+						{% for hot_product in hot_products %}
+						<div class="single-product">
+							<div class="product-img">
+								<div class="product-hot-img">
+									<a href="{{ url_for('customer.customer_products', id=hot_product.product_id) }}">
+										{% if hot_product.product_image_id %}
+										<img class="default-img" src="/blueprints/static/product_image/{{hot_product.product_image}}" alt="{{hot_product.product_image}}" loading="lazy">
+										{% else %}						
+										<img class="default-img" src="/blueprints/static/product_image/default-image.jpg" alt="default-image.jpg" loading="lazy">
+										{% endif %}
+										<span class="hot-icon">Hot</span>
+									</a>
+								</div>
+							</div>
+							<div class="product-content">
+								<h3><a href="{{ url_for('customer.customer_products', id=hot_product.product_id) }}">{{hot_product.product_name}}</a></h3>
+							</div>
+						</div>
+						{% endfor %}
+						<!-- End Single Product -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- End Most Popular Area -->
+
+	<!-- Start News Area -->
+	<div class="product-area most-popular section">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="section-title">
+						<h2>Latest News</h2>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="owl-carousel owl-theme  popular-slider">
+						<!-- Start Single News -->
+						{% for new in news %}
+						{% if new.news_status == 1 %}
+						<div class="item">
+							<div class="product-img">
+								<img class="default-img" src="/blueprints/static/news/{{new.news_image}}" alt="{{new.news_image}}" style="max-width: 20vw; max-height: 20vh;" loading="lazy">
+							</div>
+							<div class="product-content">
+								<h5>{{new.news_subject}}</h5>
+								<h6>{{new.news_timestamp|nzdatetime }}</h6>
+								<div class="product-price">
+									<span>{{new.news_content}}</span>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						{% endfor %}
+						<!-- End Single News -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End News Area -->
+		
+	
+		
+	<div id="F.A.Q"></div>
+	<br>
+	<br>
+	<br>
+	<!-- FAQ 1 - Bootstrap Brain Component -->
+<section class="bg-light py-3 py-md-5">
+	<div class="container">
+	  <div class="row gy-5 gy-lg-0 align-items-lg-center">
+		<div class="col-12 col-lg-6">
+		  <img class="img-fluid rounded" loading="lazy" src="{{ url_for('static', filename='customer/images/faq.jpg') }}" alt="How can we help you?">
+		</div>
+		<div class="col-12 col-lg-6">
+		  <div class="row justify-content-xl-end">
+			<div class="col-12 col-xl-11">
+			  <h2 class="h1 mb-3" style="text-align: center;">F.A.Q</h2>
+			  <p class="lead fs-4 text-secondary mb-5">We hope you have found an answer to your question. If you need any help, please search your query on our Support Center or contact us via email.</p>
+			  <div class="accordion accordion-flush" id="accordionExample">
+				<div class="accordion-item">
+				  <h2 class="accordion-header" id="headingOne">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+					  How Do I Change My Account Information?
+					</button>
+				  </h2>
+				  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+					  <p>To change your account information, please follow these steps:</p>
+					  <ul>
+						<li>Go to our website and sign in to your account.</li>
+						<li>Click on your 'My account' in the top right corner of the page."</li>
+						<li>Under the "Account Information" section, click on "Edit."</li>
+						<li>Make your changes and click on "Save."</li>
+					  </ul>
+					</div>
+				  </div>
+				</div>
+				<div class="accordion-item">
+				  <h2 class="accordion-header" id="headingTwo">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+					  How Does Shipping Work?
+					</button>
+				  </h2>
+				  <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+						Shipping is across NZ with standard sized items costing a flat $10 and oversized item orders $100. Some items sold 
+						– such as water tanks, are pick up only – or freight by request (paid for by customer). Where an order has both 
+						standard and oversize items the higher delivery charge will apply.  Shipping to NZ outer islands, is by quote – this 
+						can be sent to a freight provider at the request and expense of the customer. Pick-up from the Alexandra can also 
+						be selected – orders ideally are ready within three days
+					</div>
+				  </div>
+				</div>
+				<div class="accordion-item">
+				  <h2 class="accordion-header" id="headingThree">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+					  How Do I Contact the Team?
+					</button>
+				  </h2>
+				  <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+					  <ul>
+						<li>Phone: +064 (21) 1234567</li>
+						<li>Email: support@moacreek.com</li>
+						<li>Address: 42 Farmland Road, Alexandra, Central Otago</li>
+					  </ul>
+					</div>
+				  </div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="headingFour">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						How does the customer loyalty reward system work?
+					  </button>
+					</h2>
+					<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+					  <div class="accordion-body">
+						The company has a points-based reward system to encourage customer loyalty: <strong>1 dollar = 1 point</strong> – once a customer gets to a certain 
+						level of points, they receive a gift card. It has frequent promotions running (e.g., by two of a product– get one free, 
+						or specials on farm boots etc) and a range of specials at any time
+					  </div>
+					</div>
+				  </div>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </section>
+	
+	<!-- Start Shop Services Area -->
+	<section class="shop-services section home">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-rocket"></i>
+						<h4>Free shiping</h4>
+						<p>Orders over $100</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-reload"></i>
+						<h4>Free Return</h4>
+						<p>Within 30 days returns</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-lock"></i>
+						<h4>Sucure Payment</h4>
+						<p>100% secure payment</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-tag"></i>
+						<h4>Best Peice</h4>
+						<p>Guaranteed price</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Services Area -->
+	
+	<!-- Start Shop Newsletter  -->
+	<section class="shop-newsletter section">
+		<div class="container">
+			<div class="inner-top">
+				<div class="row">
+					<div class="col-lg-8 offset-lg-2 col-12">
+						<!-- Start Newsletter Inner -->
+						<div class="inner">
+							<h4>Newsletter</h4>
+							<p> Subscribe to our newsletter and get <span>10%</span> off your first purchase</p>
+							<form action="mail/mail.php" method="get" target="_blank" class="newsletter-inner">
+								<input name="EMAIL" placeholder="Your email address" required="" type="email">
+								<button class="btn">Subscribe</button>
+							</form>
+						</div>
+						<!-- End Newsletter Inner -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Newsletter -->
+	
+	<script>
+	$(document).ready(function(){
+		$('.owl-carousel').owlCarousel({
+		loop:true,
+		margin:10,
+		nav:true,
+		responsive:{
+			0:{
+				items:1
+			},
+			600:{
+				items:3
+			},
+			1000:{
+				items:4
+			}
+		}
+		})
+	});
+	</script>
+{% endblock %}
