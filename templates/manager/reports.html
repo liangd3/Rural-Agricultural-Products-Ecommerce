@@ -1,0 +1,155 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="pagetitle">
+      <h1>Reports</h1>
+      <nav>
+        <ol class="breadcrumb">
+            {% if session['user_type'] == 'admin' %}
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_dashboard') }}">Home</a></li>
+            {% elif session['user_type'] == 'manager' %}
+           <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_dashboard') }}">Home</a></li>
+           
+           {% endif %}
+           <li class="breadcrumb-item"><a href="{{ url_for('manager.reports') }}">Reports</a></li>
+        </ol>
+        <form method="POST" action="{{ url_for('manager.reports') }}">
+        <label for="startdate">Start Date:</label>
+        <input type="date" id="startdate" name="startdate" max="{{today}}"     {% if startdate %}  value="{{startdate}}"         {% endif %}   required > 
+        <label for="enddate">End Date:</label>
+        <input type="date" id="enddate" name="enddate" max="{{today}}"   {% if enddate %}  value="{{enddate}}"         {% endif %} > 
+        <button type="submit" class="btn btn-success btn-block" >
+          Submit
+        </button>
+      </form>
+      </nav>
+
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <div class="row">
+        <div class="col-xl-12">
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+  
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#products-report">Products Report</button>
+                </li>
+  
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customers-report">Customers Report</button>
+                </li>
+  
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orders-report">Orders Report</button>
+                </li>
+  
+              </ul>
+              <div class="tab-content pt-2">
+                <div class="tab-pane fade show active products-report" id="products-report">
+                    <h5 class="card-title">{% if not enddate%}This Month {% endif %} Most Popular Products</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+                              <th>Product Name</th>
+                              <th>Total Quantity Sold</th>
+                              <th>Current Stock</th>
+                              <th>Selling Price</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                  <td>
+                                    <a href="{{ url_for('internal.product_detail', id=product.product_id) }}">{{ product.product_name }} </a>
+                                    </td>
+                                  <td>{{ product.total_quantity_sold }}</td>
+                                  <td>{{ product.stock_quantity }} </td>
+                                  <td>{{ product.product_price }}</td>              
+                                </tr> 
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+  
+                <div class="tab-pane fade customers-report pt-3" id="customers-report">
+                    <h5 class="card-title">{% if not enddate%}This Month {% endif %} Highest Spent Customers</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+
+                              <th>Customer ID</th>
+
+                              <th>Customer Name</th>
+                              <th>Total Spent</th>
+                              <th>Phone Number</th>
+                              <th>Current Point</th>
+                              <th>Credit Limit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+
+                                  <td><a href="{{ url_for('manager.customerorders', id = customer.user_id) }}">{{ customer.user_id }}</a></td>
+
+                                  <td>{{ customer.first_name }} {{ customer.last_name }} </td>
+                                  <td>{{ customer.total_spent }}</td>
+                                  <td>{{ customer.phone }} </td>
+                                  <td>{{ customer.points }}</td>  
+                                  <td>{{ customer.credit_limit }}</td>      
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+  
+                <div class="tab-pane fade pt-3" id="orders-report">
+                    <h5 class="card-title">{% if not enddate%}This Month {% endif %} Highest Amount Orders</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+                              <th>Order ID</th>
+                              <th>Total Amount</th>
+                              <th>Order Status</th>
+                              <th>Order Date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                  <td>
+                                    <a href="{{ url_for('internal.orderDetails', id = order.order_id) }}">{{ order.order_id }} </a>
+                                    </td>
+                                  <td>{{ order.total_amount }}</td>
+                                  <td>{{ order.order_status }} </td>
+                                  <td>{{ order.order_date|nzdate }}</td>              
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+              </div><!-- End Bordered Tabs -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</main><!-- End #main -->
+
+
+{% endblock %}

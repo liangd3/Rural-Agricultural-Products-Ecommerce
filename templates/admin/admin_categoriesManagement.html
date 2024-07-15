@@ -1,0 +1,237 @@
+{% extends 'admin/admin_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Admin {% endblock %}
+
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Categories Management</h1>
+      <nav>
+        <ol class="breadcrumb">
+          {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+          <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+          <li class="breadcrumb-item active">Categories Management</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+              <div class="card-body">
+                  <br>
+                    <!-- Button -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <button type="button" id="newButton" class="btn btn-primary btn-sm" onclick="toggleNewRow()">Add New</button>
+                        <button type="button" id="cancelButton" class="btn btn-secondary mr-2" onclick="window.location.href='/admin/categoriesManagement'" style="display: none;">Cancel</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable" id="myTable">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="newRow" style="display: none;">
+                                    <td>
+                                        <input type="text" id="new_category_name" name="new_category_name" required>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" onclick="validateAndSubmitNewCategoryName()">Done</button>
+                                    </td>
+                                </tr>
+                                {% for category in categories %}
+                                <tr>
+                                    <td> 
+                                        {{category.category_id}}
+                                    </td>
+                                    <td> 
+                                        <input type="text" id="category_name_{{ category.category_id }}" name="category_name_{{ category.category_id }}" value="{{ category.category_name }}" disabled>
+                                    </td>
+                                    <!-- Actions -->
+                                    <td>
+                                        <input type="hidden" name="category_id" value="{{ category.category_id }}">
+                                        <button type="button" class="btn btn-primary" data-id="{{ category.category_id }}" data-action="edit" onclick="toggleEdit('{{ category.category_id }}')">Edit</button>
+                                        <button type="button" class="btn btn-primary" style="display: none;" data-id="{{ category.category_id }}" data-action="done" id="doneButton_{{ category.category_id }}" onclick="validateAndSubmitCategoryName('{{ category.category_id }}')">Done</button>
+                                    </td>                    
+                                </tr>                         
+                                {% endfor %}
+                            
+                              
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+</main><!-- End #main -->
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+// toggle edit button
+function toggleEdit(categoryId) {
+    var input = document.getElementById('category_name_' + categoryId);
+    var inputs = document.querySelectorAll('#category_name_' + categoryId);
+    var editButton = document.querySelector('button[data-id="' + categoryId + '"][data-action="edit"]');
+    var doneButton = document.querySelector('button[data-id="' + categoryId + '"][data-action="done"]'); 
+    var cancelButton = document.getElementById('cancelButton');    
+
+    if (editButton.style.display !== 'none') {
+        editButton.style.display = 'none';
+        doneButton.style.display = 'inline-block';
+        cancelButton.style.display = 'inline-block';
+    } else {
+        editButton.style.display = 'inline-block';
+        doneButton.style.display = 'none';
+        cancelButton.style.display = 'none';
+    }
+    inputs.forEach(function(input) {
+        input.disabled = !input.disabled;
+    });
+  }
+
+  // toggle a new row when adding a new record
+  function toggleNewRow() {
+    var newRow = document.getElementById('newRow');
+    var newButton = document.getElementById('newButton');
+    var cancelButton = document.getElementById('cancelButton');    
+    
+    newRow.style.display = newRow.style.display === 'none' ? 'table-row' : 'none';
+
+    if (newButton.style.display !== 'none') {
+        newButton.style.display = 'none';
+        cancelButton.style.display = 'inline-block';
+    } else {
+        newButton.style.display = 'inline-block';
+        cancelButton.style.display = 'none';
+    }
+
+    if (newButton.textContent === 'New') {
+        newButton.textContent = 'Undo';
+    } else {
+        newButton.textContent = 'New';
+    }
+  }
+
+  // input validation for a new input record
+  function validateAndSubmitNewCategoryName() {
+
+    var newCategoryName = document.getElementById('new_category_name').value.trim();
+
+    if (!newCategoryName) {
+        alert('Please complete the field');
+        return;
+    }
+
+    // Check for special characters in Category Name
+    var categoryNameTest = /^[a-zA-Z0-9 ]+$/;
+    if (!categoryNameTest.test(newCategoryName)) {
+        alert('Category name cannot contain special characters!');
+        return;
+    }
+
+    var existingRows = document.querySelectorAll('#myTable tbody tr');
+    for (var i = 0; i < existingRows.length; i++) {
+        if (existingRows[i].id === 'newRow') continue; // Skip the new row
+
+        var existingCategoryName = existingRows[i].querySelector('input[name^="category_name_"]').value.trim();
+
+        // Check if category name and subcategory name match existing
+        if (newCategoryName === existingCategoryName) {
+                alert('This category name already exists.');
+                return;
+        }
+    }
+    // Create a hidden form
+    var form = document.createElement('form');
+    form.style.display = 'none'; // Hide the form
+
+    // Set form attributes
+    form.method = 'POST';
+    form.action = '{{ url_for('admin.admin_categoriesManagement') }}';
+
+  // Create form fields and append them to the form
+  function createAndAppendInput(name, value) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+  }
+    createAndAppendInput('new_category_name', newCategoryName);
+
+    // Append the form to the document body
+    document.body.appendChild(form);
+    // Submit the form
+    form.submit();
+  }
+
+    // input validation for a editted input record
+  function validateAndSubmitCategoryName(categoryId) {
+    var CategoryName = document.getElementById('category_name_' + categoryId).value.trim();
+
+    if (!CategoryName) {
+        alert('Please complete the field');
+        return;
+    }
+
+    // Check for special characters in Category Name
+    var categoryNameTest = /^[a-zA-Z0-9 ]+$/;
+    if (!categoryNameTest.test(CategoryName)) {
+        alert('Category name cannot contain special characters!');
+        return;
+    }
+
+    var existingRows = document.querySelectorAll('#myTable tbody tr');
+    for (var i = 0; i < existingRows.length; i++) {
+        if (existingRows[i].id === 'newRow') continue; // Skip the new row
+        var existingCategoryId = existingRows[i].querySelector('input[name="category_id"]').value;
+        if (existingCategoryId === categoryId) continue; // Skip the current edited row
+
+    var existingCategoryName = existingRows[i].querySelector('input[name^="category_name_"]').value.trim();
+
+    // Check if category name and subcategory name match existing
+    if (CategoryName === existingCategoryName) {
+        alert('This category name already exists.');
+        return;
+    }}
+    
+
+    // Create a hidden form
+    var form = document.createElement('form');
+    form.style.display = 'none'; // Hide the form
+
+    // Set form attributes
+    form.method = 'POST';
+    form.action = '{{ url_for('admin.admin_categoriesManagement') }}';
+
+    // Create form fields and append them to the form
+    function createAndAppendInput(name, value) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+
+    createAndAppendInput('category_id', categoryId);
+    createAndAppendInput('category_name', CategoryName);
+
+    // Append the form to the document body
+    document.body.appendChild(form);  
+    // Submit the form
+    form.submit();
+  } 
+</script>
+{% endblock %}

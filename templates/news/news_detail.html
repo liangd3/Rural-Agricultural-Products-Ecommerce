@@ -1,0 +1,198 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+
+    <h1>News Detail</h1>
+    <nav>
+      <ol class="breadcrumb">
+        {% set homepath = session.user_type ~ "." ~ session.user_type ~ "_dashboard"%}
+        <li class="breadcrumb-item"><a href="{{ url_for(homepath) }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('manager.newsManagement') }}">News Management</a></li>
+        <li class="breadcrumb-item active">{{new.news_id}}</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+    <section class="section profile">
+
+
+      <div class="row">
+  
+        <div class="col-xl-8">
+  
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+  
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#news-overview" onclick="overviewTab()">Overview</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#news-edit" onclick="editTab()">Edit</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#news-image" onclick="imageTab()">Image</button>
+                </li>
+  
+              </ul>
+              <div class="tab-content pt-2">
+  
+                <div class="tab-pane fade show active profile-overview" id="news-overview">
+  
+                  <h5 class="card-title">News Details</h5>
+  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label ">Subject</div>
+                    <div class="col-lg-9 col-md-8">{{new.news_subject}}</div>
+                  </div>
+  
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Content</div>
+                    <div class="col-lg-9 col-md-8">{{new.news_content}}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Time</div>
+                    <div class="col-lg-9 col-md-8">{{new.news_timestamp|nzdatetime }}</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Sender ID</div>
+                    <div class="col-lg-9 col-md-8">{{new.sender_id}}</div>
+                  </div>  
+                </div>
+  
+                <div class="tab-pane fade news-edit pt-3" id="news-edit">
+  
+                  <!-- News Edit Form -->
+                  {% if new.news_status %}
+                  <form action="{{url_for('manager.sendNews', id = new.news_id, action = 'sent')}}" method="post">
+                    <input type="submit" style="left: 93%;position: relative;" class="btn btn-sm btn-danger float-right mb-2" value="Sent" disabled/>
+                  {% else %}
+                  <form action="{{url_for('manager.sendNews', id = new.news_id, action = 'sent')}}" method="post">
+                    <input type="submit" style="left: 89%;position: relative;" class="btn btn-sm btn-success float-right mb-2" value="Send Now"/>
+                  {% endif %}
+                  </form>
+
+                  <form method="POST" enctype=multipart/form-data id="newseditform" action="{{ url_for('manager.news_detail', id = new.news_id)}}" >
+
+                    <div class="row mb-3">
+                      <label for="news_subject" class="col-md-4 col-lg-3 col-form-label">Subject</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="news_subject" type="text" class="form-control" id="news_subject" value="{{new.news_subject}}" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="news_content" class="col-md-4 col-lg-3 col-form-label">Content</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="news_content" class="form-control" id="news_content" rows="4" required>{{new.news_content}}</textarea>
+                      </div>
+                    </div>
+
+                    <!-- <div class="row mb-3">
+                      <label for="news_timestamp" class="col-md-4 col-lg-3 col-form-label">Time</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="news_timestamp" type="datetime-local" class="form-control" id="news_timestamp" value="{{new.news_timestamp}}"required>
+                      </div>
+                    </div> -->
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </form>
+  
+                </div>
+
+
+
+                <!-- Edit images -->
+              
+                <div class="tab-pane fade news-edit pt-3" id="news-image">
+                  <div class="row">
+                    <div class="col-md-4 position-relative">
+                      <div class="card mb-3">
+                        <img src="/blueprints/static/news/{{ new.news_image }}" class="card-img-top img-fluid" style="max-height: 20vh; object-fit: cover;">
+                        <div class="card-body">
+                          <form method="POST" action="{{ url_for('manager.news_img_delete', newsID=new.news_id) }}" class="mt-2">
+                            <button type="submit" class="btn btn-danger btn-sm w-100" title="Remove news image">
+                              <i class="bi bi-trash"></i> Remove
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                <div class="card-body pt-3">
+                  <form method="POST" enctype="multipart/form-data" action="{{ url_for('manager.news_img_uploader', id=new.news_id) }}">
+                    <label for="imageUploader" class="">Upload image:</label>
+                    <input type="file" name="uploadedImage" multiple id="imageUploader" class="form-control mt-2" onchange="this.form.submit()">
+                  </form>
+                </div>
+                </div>
+
+
+              </div><!-- End Bordered Tabs -->
+  
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </section>
+</main><!-- End #main -->
+
+
+<script>
+  $(document).ready(function(){
+    // Initialize Bootstrap tabs
+    $('#typeTab a').on('click', function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    var selectedTab = $('#subcatSelector').val();
+      $('#typeTab a[href="#' + selectedTab + '"]').tab('show');
+    
+    $('#subcatSelector').on('change', function(){
+      var selectedTab = $(this).val();
+      $('#typeTab a[href="#' + selectedTab + '"]').tab('show');
+    });
+    
+  });
+  function overviewTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'none';
+    imageCard.style.display = 'block';
+  }
+  function editTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'block';
+    imageCard.style.display = 'none';
+    
+  }
+
+  function imageTab() {
+    var subcatCard = document.getElementById('subcatCard');
+    var imageCard = document.getElementById('imageCard');
+
+    subcatCard.style.display = 'none';
+    imageCard.style.display = 'none';
+  }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,333 @@
+{% if session['user_type'] == 'staff' %}
+{% extends 'staff/staff_layout.html' %} 
+{% elif session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies - Order Id: {{ order.order_id }}{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Order Detail</h1>
+    <nav>
+      <ol class="breadcrumb">
+        {% set homepath = session.user_type ~ "." ~ session.user_type ~ "_dashboard"%}
+        <li class="breadcrumb-item"><a href="{{ url_for(homepath) }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('internal.orderManagement') }}">Order Management</a></li>
+        <li class="breadcrumb-item active">Order ID: {{order.order_id}}</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <div class="row">
+        <div class="col-xl-8">
+          <div class="card">
+            <div class="card-body pt-3">
+              <div class="tab-content pt-2">
+  
+                <h5 class="card-title">Order Details</h5>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Order Id:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_id }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Customer Id:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.user_id }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Order Status:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_status }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md_4 label"><strong>Shipping Method:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.shipping_name }}:  ${{ order.shipping_price }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Shipping Address:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.shipping_address }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Order Date:</strong></div>
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ order.order_date|nzdate }}</div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label"><strong>Payment:</strong></div>
+                  {% if payment %}
+                  <div class="col-lg-9 col-md-8 text-capitalize">{{ payment.payment_type_name }}</div>
+                  {% else %}
+                  <div class="col-lg-9 col-md-8 text-capitalize" style="color: red;">Not paid yet.</div>
+
+                  {% if order.order_status != "pending" and order.order_status != "cancelled" %}
+                  <div> <a href="{{ url_for('internal.customerPayWithCash', id = order.order_id) }}" onclick="confirmPayment(event)">Pay with Cash/Eftpos</a></div>
+                  {% endif %}
+                  {% endif %}
+                </div>
+
+
+                <br>
+                  <div class="table-responsive">
+                    <table class="table table-hover datatable">
+                        <thead>
+                        <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Discount Rate</th>
+                                <th>Final Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in lines %}
+                            <tr>
+                              <td>
+                                {% if l.product_image %}
+                                  <img src="/blueprints/static/product_image/{{ l.product_image }}" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                                  {% else %}
+                                  <img src="/blueprints/static/product_image/default-image.jpg" alt="Product" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                                  {% endif %}
+                               
+                                  {{l.product_name}}
+                              </td>
+                              <td>{{ l.quantity }}</td>
+                              <td>{{ l.unit_price }}</td>
+                              <td>{{ l.discount_rate }}</td>
+                              <td>{{ l.final_unit_price }}</td>
+           
+                          </tr>
+                          
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+                {%  if shipping_prices%}
+                <div>
+                  <label for="shipping_price">Choose a shipping price:</label>
+                  <select name="shipping_price" id="shipping_price" required>
+                      <option selected disabled value="">Please select shipping method:</option>
+                      {% for s in shipping_prices %}
+                      <option value="{{ s.shipping_method_id }}">{{ s.shipping_name }}: ${{ s.shipping_price }}</option>
+                      {% endfor %}
+                  </select>
+                 
+                  
+                  
+                  
+
+                  <div>Need more shipping methods?</div>
+                  <div>
+                   
+                    {% if session['user_type'] == 'admin' %}
+                    <a href="{{ url_for('admin.admin_shippingPriceManagement') }}">Add more shipping prices</a>
+                    {% else %}
+                    <div>Contact Admin to add shipping price</div>
+                    {% endif %}
+                  </div>
+                  
+                </div>
+
+                {% endif %}
+               <br>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#cancelModal" {% if order.order_status == "cancelled" %}disabled{% endif %} onclick="cancelOrder()">Cancel</button>
+               
+                   <!-- Modal for cancel confirmation -->
+                   <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="cancelModalLabel">Cancel Order</h5>
+                         
+                        </div>
+                        <div class="modal-body">
+                          <div class="form-group">
+                              <label for="cancelReason">Reason for cancellation:</label>
+                              <select class="form-control" id="cancelReason" name="cancelReason">
+                                <option value="Out of stock">Out of stock</option>
+                                <option value="Customer changed mind">Customer changed mind</option>
+                                <option value="Delivery delay">Delivery delay</option>
+                                <option value="Other">Other</option>
+                             
+                              </select>
+                            </div>
+                            <button onclick="submitCancelForm()" class="btn btn-danger">Confirm Cancel</button>
+                            <button type="button" onclick="hideCancelModal()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+           
+               
+               
+                <button class="btn btn-info" onclick="markAsReady()" {% if order.order_status == "cancelled" or order.shipping_price != 0.0 or order.order_status == "ready" or order.order_status == "finished"  or  order.order_status == "pending" %}disabled{% endif %}>Ready for Pickup</button>
+                <button class="btn btn-success" onclick="markAsSent()" {% if order.order_status == "cancelled" or  order.shipping_price == 0.0 or order.order_status == "sent" or order.order_status == "finished" or  order.order_status == "pending" %}disabled{% endif %}>Parcel Sent</button>
+                <button class="btn btn-success" onclick="markAsComplete()" {% if order.order_status == "cancelled" or  order.order_status == "finished"  or  order.order_status == "pending" %}disabled{% endif %}>Complete</button>
+                <button class="btn btn-warning" id="submit_button" onclick="updateShippingPrice()" {% if order.order_status == "cancelled" or  order.order_status != "pending" %}disabled{% endif %}>Update Shipping Price</button>
+                
+                </div>
+
+
+              </div>
+  
+            </div>
+          </div>
+  
+        </div>
+
+
+      
+
+
+      </div>
+    </section>
+</main><!-- End #main -->
+
+<script>
+
+function showCancelModal() {
+    // Show the cancel modal
+    $('#cancelModal').modal('show');
+}
+
+function hideCancelModal() {
+    // Show the cancel modal
+    $('#cancelModal').modal('hide');
+}
+
+// Function to handle form submission for cancellation
+function submitCancelForm() {
+    // Get the selected cancellation reason
+    const cancelReason = document.getElementById('cancelReason').value;
+
+    // Send a GET request to cancel the order with the selected reason
+    fetch(`{{ url_for('internal.updateOrder', id=order.order_id, action='cancelled') }}?reason=${cancelReason}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If successful, reload the page or update UI as needed
+            location.reload(); // Example: Reload the page
+        } else {
+            // If failed, handle the error appropriately
+            console.error('Failed to cancel order');
+        }
+    })
+    .catch(error => {
+        // Handle any network errors
+        console.error('Network error:', error);
+    });
+}
+
+function cancelOrder() {
+    // Show the cancel modal when the cancel button is clicked
+    showCancelModal();
+}
+
+function markAsReady() {
+   // Send a GET request to mark the order as ready for pickup
+   fetch(`{{ url_for('internal.updateOrder', id=order.order_id, action='ready') }}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If successful, reload the page or update UI as needed
+            location.reload(); // Example: Reload the page
+        } else {
+            // If failed, handle the error appropriately
+            console.error('Failed to mark order as ready for pickup');
+        }
+    })
+    .catch(error => {
+        // Handle any network errors
+        console.error('Network error:', error);
+    });
+}
+
+function markAsSent() {
+    // Send a GET request to mark the order as ready for pickup
+    fetch(`{{ url_for('internal.updateOrder', id=order.order_id, action='sent') }}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If successful, reload the page or update UI as needed
+            location.reload(); // Example: Reload the page
+        } else {
+            // If failed, handle the error appropriately
+            console.error('Failed to mark order as ready for pickup');
+        }
+    })
+    .catch(error => {
+        // Handle any network errors
+        console.error('Network error:', error);
+    });
+}
+
+function markAsComplete() {
+   {% if not payment %}
+       alert("Not paid yet, cannot finish.");
+       return;
+   {% endif %}
+   
+   // Send a GET request to mark the order as ready for pickup
+   fetch(`{{ url_for('internal.updateOrder', id=order.order_id, action='finished') }}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If successful, reload the page or update UI as needed
+            location.reload(); // Example: Reload the page
+        } else {
+            // If failed, handle the error appropriately
+            console.error('Failed to mark order as ready for pickup');
+        }
+    })
+    .catch(error => {
+        // Handle any network errors
+        console.error('Network error:', error);
+    });
+}
+
+function updateShippingPrice() {
+    const shipping_method_id = document.getElementById('shipping_price').value;
+
+    if (shipping_method_id === "") {
+        alert("Please select a valid shipping method.");
+        return;  // Exit the function to prevent further execution
+    }
+
+    // Send a GET request to mark the order as ready for pickup
+    fetch(`{{ url_for('internal.updateOrder', id=order.order_id, action='placed')}}?shipping=${shipping_method_id}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If successful, reload the page or update UI as needed
+            location.reload(); // Example: Reload the page
+        } else {
+            // If failed, handle the error appropriately
+            console.error('Failed to mark order as ready for pickup');
+        }
+    })
+    .catch(error => {
+        // Handle any network errors
+        console.error('Network error:', error);
+    });
+}
+
+function confirmPayment(event) {
+    event.preventDefault();
+    if (confirm("Are you sure you want to proceed with Cash/Eftpos payment?")) {
+        window.location.href = event.target.href;
+    }
+}
+
+</script>
+
+{% endblock %}

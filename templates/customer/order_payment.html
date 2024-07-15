@@ -1,0 +1,244 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+	<!-- Breadcrumbs -->
+	<div class="breadcrumbs">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="bread-inner">
+						<ul class="bread-list">
+							<li><a href="/">Home<i class="ti-arrow-right"></i></a></li>
+							<li ><a href="{{ url_for('customer.customer_order_details', id = order.order_id) }}">Order Details<i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a href="#">Pay</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Breadcrumbs -->
+			
+	<!-- Start Checkout -->
+	<section class="shop checkout section">
+		<div class="container">
+			<form method="POST" id="checkout-form" action="{{url_for('customer.customer_pay_order', id = order.order_id)}}">
+				<div class="row"> 
+					<div class="col-12">
+						<div class="form-main">		
+							<!--Payment form-->
+							<div class="title">
+								<h5 class="card-title">Order Details</h5>
+								<h5 id="total_amount">Total Amount to Pay: ${{order.total_amount}}</h5>
+							</div>
+							<div class="row">
+								<div id="payment-section" class="col-lg-8" >
+									<div class="card row card p-4 mt-4 mb-4" id="card-card">
+										<div class="col-lg-9 col-md-9 col-12">
+											<div class="form-group">
+												<label>Card Number</label>
+												<input type="tel" name="card_number" id="card-number" 
+												inputmode="numeric" pattern="[0-9\s]{15,19}" 
+												autocomplete="cc-number" maxlength="19" 
+												placeholder="xxxx xxxx xxxx xxxx" required>
+											</div>
+										</div>
+										<div class="col-lg-3 col-md-3 col-12">
+											<div class="form-group">
+												<label>CVV Number</label>
+												<input type="number" name="card_cvv" id="card-cvv" 
+												type="tel" inputmode="numeric" pattern="[0-9\s]{15,19}"
+												maxlength="4" placeholder="xxx" required>
+											</div>
+										</div>
+										<div class="col-lg-2 col-md-2 col-12">
+											<div class="form-group">
+												<label>Expiry Date</label>
+												<input type="number" name="card_month" id="card-month" 
+												type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+												maxlength="2" min="0" max="12" placeholder="MM" required>
+												<span>/</span>
+												<input type="number" name="card_year" id="card-year" 
+												type="tel" inputmode="numeric" pattern="[0-9\s]{2}"
+												maxlength="2" min="24" max="99" placeholder="YY" required>
+											</div>
+										</div>
+										<div class="col-lg-2 col-md-2 col-12">
+											<div class="form-group">
+												<label>Name</label>
+												<input type="text" name="card_name" id="card-name" required>
+											</div>
+										</div>
+									</div>
+								</div>
+							<!--End Payment form-->
+								<div class="col-lg-4">
+									<div class="order-details">
+										<!-- Gift Card Widget -->
+										<div class="single-widget">
+											<h2>Gift Card</h2>
+											<div class="content">
+												<ul>
+													<li>
+													{% for card in giftcards %}
+													<input type="checkbox" class="giftcard-checkbox" id="giftcard{{card.gift_card_id}}" name="giftcard{{card.gift_card_id}}" value="{{card.gift_card_amount}}">
+													<label for="giftcard{{card.gift_card_id}}"> {{card.gift_card_number}}: ${{card.gift_card_amount}}</label><br>					
+													{% endfor %}
+												</li>
+											</ul>
+										</div>
+										<div class="single-widget get-button">
+											<div class="button">	
+												<button type="button" id="apply-giftcard-button" class="btn">Apply Giftcard</button>
+											</div>
+										</div>
+								
+										<div class="single-widget payement">
+											<div class="content">
+												<img src="{{ url_for('static', filename='customer/images/payment-method.png') }}" alt="#">
+											</div>
+										</div>
+										<!--/ End Payment Method Widget -->
+										<!-- Button Widget -->
+										<div class="single-widget get-button">
+											<div class="content">
+												<div class="button">
+													<button type="submit" id="submit-button" class="btn">Pay</button>
+												</div>
+											</div>
+										</div>
+										<!--/ End Button Widget -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+	</section>
+	<!--/ End Checkout -->
+	
+	<!-- Start Shop Services Area  -->
+	<section class="shop-services section home">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-rocket"></i>
+						<h4>Free shiping</h4>
+						<p>Orders over $100</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-reload"></i>
+						<h4>Free Return</h4>
+						<p>Within 30 days returns</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-lock"></i>
+						<h4>Sucure Payment</h4>
+						<p>100% secure payment</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+				<div class="col-lg-3 col-md-6 col-12">
+					<!-- Start Single Service -->
+					<div class="single-service">
+						<i class="ti-tag"></i>
+						<h4>Best Peice</h4>
+						<p>Guaranteed price</p>
+					</div>
+					<!-- End Single Service -->
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Services -->
+	
+	<!-- Start Shop Newsletter  -->
+	<section class="shop-newsletter section">
+		<div class="container">
+			<div class="inner-top">
+				<div class="row">
+					<div class="col-lg-8 offset-lg-2 col-12">
+						<!-- Start Newsletter Inner -->
+						<div class="inner">
+							<h4>Newsletter</h4>
+							<p> Subscribe to our newsletter and get <span>10%</span> off your first purchase</p>
+							<form action="mail/mail.php" method="get" target="_blank" class="newsletter-inner">
+								<input name="EMAIL" placeholder="Your email address" required="" type="email">
+								<button class="btn">Subscribe</button>
+							</form>
+						</div>
+						<!-- End Newsletter Inner -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Newsletter -->
+	
+
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const applyGiftcardButton = document.getElementById('apply-giftcard-button');
+			const totalAmountElement = document.getElementById('total_amount');
+			const cardCard = document.getElementById('card-card');
+			const giftcardCheckboxes = document.querySelectorAll('.giftcard-checkbox');
+			let initialTotalAmount = parseFloat("{{order.total_amount}}");
+
+			applyGiftcardButton.addEventListener('click', function() {
+				let totalGiftCardAmount = 0;
+				giftcardCheckboxes.forEach(function(checkbox) {
+					if (checkbox.checked) {
+						totalGiftCardAmount += parseFloat(checkbox.value);
+					}
+				});
+
+				let newTotalAmount = initialTotalAmount - totalGiftCardAmount;
+				newTotalAmount = newTotalAmount < 0 ? 0 : newTotalAmount;
+				totalAmountElement.textContent = 'Total Amount to Pay: $' + newTotalAmount.toFixed(2);
+
+				if (newTotalAmount === 0) {
+					cardCard.style.display = 'none';
+					cardCard.querySelectorAll('input').forEach(input => input.required = false);
+				} else {
+					cardCard.style.display = 'block';
+					cardCard.querySelectorAll('input').forEach(input => input.required = true);
+				}
+			});
+
+			document.getElementById('checkout-form').addEventListener('submit', function(event) {
+				giftcardCheckboxes.forEach(function(checkbox) {
+					if (checkbox.checked) {
+						const hiddenInput = document.createElement('input');
+						hiddenInput.type = 'hidden';
+						hiddenInput.name = 'selected_giftcards';
+						hiddenInput.value = checkbox.id.replace('giftcard', '');
+						event.target.appendChild(hiddenInput);
+					}
+				});
+			});
+		});
+	</script>
+
+	{% block js %} 
+	<!-- Fancybox JS -->
+	<script src="{{ url_for('static', filename='customer/js/facnybox.min.js') }}"></script>
+	<!-- Ytplayer JS -->
+	<script src="{{ url_for('static', filename='customer/js/ytplayer.min.js') }}"></script>
+
+	{% endblock%}
+	
+{% endblock %}

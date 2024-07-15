@@ -1,0 +1,99 @@
+{% if session['user_type'] == 'staff' %}
+{% extends 'staff/staff_layout.html' %} 
+{% elif session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+
+{% block title %} Moa Creek Rural Supplies {% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <nav>
+        <ol class="breadcrumb">
+          {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+          <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+          <li class="breadcrumb-item active">My Inbox</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+              <div class="card-body">
+                  <!-- Bordered Tabs -->
+                  <h5 class="card-title">My Inbox</h5>
+  
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+                                    <th>Customer ID</th>
+                                    <th>Customer</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% if session.user_type != 'staff' %}
+                                  {% for cus_message in cus_messages %}
+                                  {% if cus_message.message_subject != 'Account Holder Application' %}
+                                  <tr>
+                                    <td>                                
+                                      {{ cus_message.user_id }}
+                                    </td>
+                                    <td>{{ cus_message.first_name }} {{ cus_message.last_name }}</td>
+                                    <td>
+                                      {% if cus_message.message_status == 1 %}
+                                      <a href="{{url_for('internal.respond_messages_lv1', message_id=cus_message.message_id)}}" style="font-weight: bold;">{{ cus_message.message_subject }}</a>
+                                      {% else %}
+                                      <a href="{{url_for('internal.respond_messages_lv1', message_id=cus_message.message_id)}}">{{ cus_message.message_subject }}</a>
+                                      {% endif %}
+                                    </td>
+                                    <td>{{ cus_message.message_timestamp|nzdatetime }}</td>
+                                    <td>{% if cus_message.message_status == 1 %} New {% else %} Replied {% endif %}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% endfor %}
+                                {% else %}
+                                  {% for cus_message in cus_messages %}
+                                  {% if cus_message.message_subject != 'Account Holder Application' and cus_message.message_subject != 'Apply for Increase in Credit Limit' %}
+                                  <tr>
+                                    <td>                                
+                                      {{ cus_message.user_id }}
+                                    </td>
+                                    <td>{{ cus_message.first_name }} {{ cus_message.last_name }}</td>
+                                    <td>
+                                      {% if cus_message.message_status == 1 %}
+                                      <a href="{{url_for('internal.respond_messages_lv1', message_id=cus_message.message_id)}}" style="font-weight: bold;">{{ cus_message.message_subject }}</a>
+                                      {% else %}
+                                      <a href="{{url_for('internal.respond_messages_lv1', message_id=cus_message.message_id)}}">{{ cus_message.message_subject }}</a>
+                                      {% endif %}
+                                    </td>
+                                    <td>{{ cus_message.message_timestamp|nzdatetime }}</td>
+                                    <td>{% if cus_message.message_status == 1 %} New {% else %} Replied {% endif %}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+
+{% endblock %}

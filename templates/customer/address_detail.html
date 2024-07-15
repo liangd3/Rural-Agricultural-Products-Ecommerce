@@ -1,0 +1,138 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Address Details
+{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumbs">
+  <div class="container">
+      <div class="row">
+          <div class="col-12">
+              <div class="bread-inner">
+                  <ul class="bread-list">
+                      <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                      <li><a href="{{ url_for('customer.customer_profile') }}">Profile<i class="ti-arrow-right"></i></a></li>
+                      <li class="active">Address Details</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<section>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+
+                {% if address %}
+                <form method="POST" action="{{ url_for('customer.edit_address_form') }}">
+                    <input type="hidden"  id="address_id" name="address_id" value="{{address.address_id}}">
+                    <h2>Edit address</h2>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td class="label">Unit Number</td>
+                                <td>
+                                    <input type="text" class="form-control addy-unit-number" id="unit_number" name="unit_number" value="{{address.unit_number}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Address Line 1</td>
+                                <td>
+                                    <input type="search" class="form-control addy-line1" id="address_line_1" name="address_line_1"  auto-complete required value="{{address.address_line1}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Address Line 2</td>
+                                <td>
+                                    <input type="text" class="form-control addy-line2" id="address_line_2" name="address_line_2" value="{{address.address_line2}}">
+                                </td>
+                            </tr>
+                          
+                            <tr>
+                                <td>City</td>
+                                <td>
+                                    <input type="text" class="form-control addy-city" id="city" name="city" value="{{address.city}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Region</td>
+                                <td>
+                                    <input type="text" class="form-control addy-region" id="region" name="region" value="{{address.region}}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Postcode</td>
+                                <td>
+                                    <input type="text" class="form-control addy-postcode" id="postcode" name="postcode" value="{{address.postcode}}">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-xs" >Edit</button>
+                    <a href="{{ url_for('customer.customer_profile') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+
+
+                {% else %}
+                <form method="POST" action="{{ url_for('customer.add_new_address_form') }}">
+                    <h2>New address</h2>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td class="label">Unit Number</td>
+                                <td>
+                                    <input type="text" class="form-control addy-unit-number" id="unit_number" name="unit_number">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Address Line 1</td>
+                                <td>
+                                    <input type="search" class="form-control addy-line1" id="address_line_1" name="address_line_1" placeholder="Start typing an address.." auto-complete required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Address Line 2</td>
+                                <td>
+                                    <input type="text" class="form-control addy-line2" id="address_line_2" name="address_line_2">
+                                </td>
+                            </tr>
+                           
+                            <tr>
+                                <td>City</td>
+                                <td>
+                                    <input type="text" class="form-control addy-city" id="city" name="city">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Region</td>
+                                <td>
+                                    <input type="text" class="form-control addy-region" id="region" name="region">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Postcode</td>
+                                <td>
+                                    <input type="text" class="form-control addy-postcode" id="postcode" name="postcode">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-xs" >Add</button>
+                    <a href="{{ url_for('customer.customer_profile') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://www.addysolutions.com/address-lookup/1.6.2/js/addy.min.js?nzKey=aaa15576a30145c4814596d8b6300363&country=nz&loadcss=true" async defer></script>
+
+{% endblock %}

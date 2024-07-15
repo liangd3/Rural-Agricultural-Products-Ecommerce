@@ -1,0 +1,82 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Giftcard History
+{% endblock %}
+
+{% block content %}
+
+    <main id="main" class="main">
+        <div class="breadcrumbs">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="bread-inner">
+                            <ul class="bread-list">
+                                <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                                <li class="active">Giftcard Center</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <section class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-main">
+                            <div class="title">
+                                <div class="table-responsive">
+                                    <div class="pagetitle">
+                                        <h4>Giftcard Center</h4>
+                                    </div><!-- End Page Title -->
+                                    <div>                 
+                                        <form method="POST" action="{{ url_for('customer.registerNewGiftcard') }}" >
+                                        <div class="row mb-3">
+                                          <label for="cardnumber" class="col-md-4 col-lg-3 col-form-label">Card Number</label>
+                                          <div class="col-md-8 col-lg-9">
+                                            <input name="cardnumber" type="text" class="form-control" id="cardnumber" minlength="16" maxlength="16" required>
+                                          </div>
+                                        </div>                      
+                                        <div class="text-center">
+                                          <button type="submit" class="btn btn-primary">Register New Giftcard</button>
+                                          <input type="reset" class="ml-2 btn btn-secondary">
+                                        </div>
+                                      </form>
+                                    </div>
+                                    </br>
+                                    <table class="table table-hover datatable">
+                                        <thead>
+                                        <tr>
+                                            <th>Gift Card Number</th>
+                                            <th>Remaining Balance</th>
+                                            <th>Source</th>
+                                            <th>Expiry Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for c in cards %}
+                                            <tr>
+                                            <td>{{ c.gift_card_number }}</td>
+                                            <td>${{c.gift_card_amount}}    </td>
+                                            <th>{{c.source}}</th>
+                                            <td><span style="font-size: 0px">{{c.expiry_date}}</span>{{ c.expiry_date |nzdate}}</td>
+                                            <td>  {%  if c.gift_card_amount == 0.00 %}  Used {% elif  c.expiry_date  < today %}   Expired {% else%}  Active {%endif%}</td>
+                                        </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+    
+    
+    {% endblock %}
+    

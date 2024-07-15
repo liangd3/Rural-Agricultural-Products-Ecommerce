@@ -1,0 +1,208 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <section class="section profile">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-12">
+                    <div class="card">
+                        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                            <img src="/blueprints/static/profile_image/{{profile.profile_image}}" alt="Profile" class="">
+                            <h2>{{profile.first_name}} {{profile.last_name}}</h2>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="col-lg-8 col-12">
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <!-- Bordered Tabs -->
+                            <ul class="nav nav-tabs nav-tabs-bordered">
+                                <li class="nav-item">
+                                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-address">Saved Addresses</button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
+                                </li>
+                            </ul>
+                        
+                            <div class="tab-content pt-2">
+                                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                                    <h5 class="card-title">Profile Details</h5>
+
+                                    <div class="row">
+                                    <div class="col-lg-3 col-md-4 label ">Full Name</div>
+                                    <div class="col-lg-9 col-md-8">{% if profile.first_name %}{{profile.first_name}} {{profile.last_name}} {%else%} New User {%endif%}</div>
+                                    </div>
+
+                                    <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Phone</div>
+                                    <div class="col-lg-9 col-md-8">{{profile.phone}}</div>
+                                    </div>
+
+                                    <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Email</div>
+                                    <div class="col-lg-9 col-md-8">{{profile.email_address}}</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">Points</div>
+                                        <div class="col-lg-9 col-md-8">{{profile.points}}</div>
+                                    </div>
+
+
+                                    {% if profile.credit_limit %}
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">Credit Limit</div>
+                                        <div class="col-lg-9 col-md-8">${{profile.credit_limit}}</div>
+
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                                    <!-- Profile Edit Form -->
+                                    <div class="row mb-3">
+                                        <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <img src="/static/profile_image/{{profile.profile_image}}" alt="Profile">
+                                            <div class="pt-2 row">
+                                                <form action="profile/uploader" method="post" enctype="multipart/form-data" class="pt-2 col-md-1">
+                                                    <input type="file" name="image" id="image" style="display: none;" onchange="form.submit()">
+                                                    <label for="image" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></label>
+                                                </form>
+                                                {% if profile.profile_image != 'default-image.jpg'%}
+                                                <form action="profile/delete" method="post" enctype="multipart/form-data" class="pt-2 col-md-1">
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <form method="POST" action="{{ url_for('customer.customer_profile_edit') }}">
+                                    <div class="row mb-3">
+                                        <label for="firstName" class="col-md-4 col-lg-3 col-form-label">First Name</label>
+                                        <div class="col-md-8 col-lg-9">
+                                        <input name="firstName" type="text" class="form-control" id="firstName" value="{{profile.first_name}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="lastName" class="col-md-4 col-lg-3 col-form-label">Last Name</label>
+                                        <div class="col-md-8 col-lg-9">
+                                        <input name="lastName" type="text" class="form-control" id="lastName" value="{{profile.last_name}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                                        <div class="col-md-8 col-lg-9">
+                                        <input name="phone" type="text" class="form-control" id="Phone" value="{{profile.phone}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                    </form><!-- End Profile Edit Form -->
+
+                                </div>
+
+                                <div class="tab-pane fade pt-3" id="profile-change-password">
+                                    <!-- Change Password Form -->
+                                    <form method="POST" action="{{ url_for('common.password_update', role = 'customer') }}">
+                                        <div class="row mb-3">
+                                            <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
+                                            <div class="col-md-8 col-lg-9">
+                                            <input name="currentPassword" type="password" class="form-control" id="currentPassword" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                                            <div class="col-md-8 col-lg-9">
+                                            <input name="newPassword" type="password" class="form-control" id="newPassword" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label for="reNewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                                            <div class="col-md-8 col-lg-9">
+                                            <input name="reNewPassword" type="password" class="form-control" id="reNewPassword" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary">Change Password</button>
+                                        </div>
+                                    </form><!-- End Change Password Form -->
+                                </div>
+
+                                <div class="tab-pane fade pt-3" id="profile-address">
+                                    {% if addresses|length < 3 %}
+                                    <form method="POST" action="{{ url_for('customer.add_new_address') }}">
+                                        <button type="submit" class="badge bg-info" >Add new address</button>
+                                    </form>
+                                    {% endif %}
+                                    <br>
+                                    {% for address in addresses %}
+                                        <div class="row">
+                                            <div class="col-lg-3 col-md-4 label">
+                                            {% if address.address_id != profile.address_id %}
+                                            <form method="POST" action="{{ url_for('customer.set_primary_address') }}">
+                                                <input type="hidden" id="primaryaddress_id" name="primaryaddress_id" value="{{ address.address_id }}">
+                                                <button type="submit" class="badge bg-warning">Set Primary Address</button>
+                                            </form>
+                                            {% else %}
+                                                <span class="badge bg-success">Primary Address</span>
+                                            {% endif %}
+                                        </div>
+                                            <div class="col-lg-6 col-md-4">
+                                                {% if address.unit_number %} {{ address.unit_number }} {% endif %}
+                                                {% if address.address_line1 %} {{ address.address_line1 }} {% endif %}
+                                                {% if address.address_line2 %} {{ address.address_line2 }} {% endif %}
+                                                {% if address.region %} {{ address.region }} {% endif %}
+                                                {% if address.city %} {{ address.city }} {% endif %}
+                                                {% if address.postcode %} {{ address.postcode }} {% endif %}
+                                            </div>
+                                            <div class="col-lg-3 col-md-4">
+                                                <form method="POST" action="{{ url_for('customer.delete_address') }}">
+                                                    <input type="hidden" id="deleteaddress_id" name="deleteaddress_id" value="{{ address.address_id }}">
+                                                    <button type="submit" class="badge bg-danger">Delete</button>
+                                                </form>
+
+                                                <form method="POST" action="{{ url_for('customer.edit_address') }}">
+                                                    <input type="hidden" id="editaddress_id" name="editaddress_id" value="{{ address.address_id }}">
+                                                    <button type="submit" class="badge bg-info" >Edit</button>
+                                                </form> 
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+
+{% endblock %}

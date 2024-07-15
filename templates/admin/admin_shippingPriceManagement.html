@@ -1,0 +1,281 @@
+{% extends 'admin/admin_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Admin {% endblock %}
+
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Shipping Prices Management</h1>
+      <nav>
+        <ol class="breadcrumb">
+          {% set path = session.user_type ~ "." ~ session.user_type ~ "_dashboard" %}
+          <li class="breadcrumb-item"><a href="{{ url_for(path) }}">Home</a></li>
+          <li class="breadcrumb-item active">Shipping Prices Management</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+              <div class="card-body">
+                  <br>
+                    <!-- Button -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <button type="button" id="newButton" class="btn btn-primary btn-sm" onclick="toggleNewRow()">Add New</button>
+                        <button type="button" id="cancelButton" class="btn btn-secondary mr-2" onclick="window.location.href='/admin/shippingPriceManagement'" style="display: none;">Cancel</button>
+                        <form id="deleteForm" action="/admin/deleteShippingPrice" method="post" style="display: none;">
+                            <input type="hidden" id="selectedIds" name="selectedIds">
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable" id="myTable">
+                            <thead>
+                            <tr>
+                                <th>Shipping Method</th>
+                                <th>Shipping Price</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Adding a new shipping method -->
+                                <tr id="newRow" style="display: none;">
+                                    <td>
+                                        <input type="text" id="new_shipping_name" name="new_shipping_name" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="new_shipping_price" name="new_shipping_price" required>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" onclick="validateAndSubmitNewShippingMethod()">Done</button>
+                                    </td>
+                                </tr>                                
+                                {% for shipping_price in shipping_prices %}
+                                <tr>
+                                    <td> 
+                                        <input type="text" id="shipping_name_{{ shipping_price.shipping_method_id }}" name="shipping_name_{{ shipping_price.shipping_method_id }}" value="{{ shipping_price.shipping_name }}" disabled>
+                                    </td>
+                                    <td> 
+                                        <input type="text" id="shipping_price_{{ shipping_price.shipping_method_id }}" name="shipping_price_{{ shipping_price.shipping_method_id }}" value="{{ shipping_price.shipping_price }}" disabled> 
+                                    </td>
+                                    <!-- Actions -->
+                                    <td>
+                                        <input type="hidden" name="shipping_method_id" value="{{ shipping_price.shipping_method_id }}">
+                                        <button type="button" class="btn btn-primary" data-id="{{ shipping_price.shipping_method_id }}" data-action="edit" onclick="toggleEdit('{{ shipping_price.shipping_method_id }}')">Edit</button>
+                                        <button type="button" class="btn btn-primary" style="display: none;" data-id="{{ shipping_price.shipping_method_id }}" data-action="done" id="doneButton_{{ shipping_price.shipping_method_id }}" onclick="validateAndSubmitShippingMethod('{{ shipping_price.shipping_method_id }}')">Done</button>
+                                        <button type="button" id="deleteButton" class="btn btn-danger" onclick="confirmDeleteHandler('{{ shipping_price.shipping_method_id }}')">Delete</button>
+                                    </td>                    
+                                </tr>                         
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+</main><!-- End #main -->
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+// toggle edit button
+function toggleEdit(shippingMethodId) {
+    var input = document.getElementById('shipping_name_' + shippingMethodId);
+    var inputs = document.querySelectorAll('#shipping_name_' + shippingMethodId + ', #shipping_price_' + shippingMethodId);
+    var editButton = document.querySelector('button[data-id="' + shippingMethodId + '"][data-action="edit"]');
+    var doneButton = document.querySelector('button[data-id="' + shippingMethodId + '"][data-action="done"]'); 
+    var cancelButton = document.getElementById('cancelButton');    
+
+    if (editButton.style.display !== 'none') {
+        editButton.style.display = 'none';
+        doneButton.style.display = 'inline-block';
+        cancelButton.style.display = 'inline-block';
+    } else {
+        editButton.style.display = 'inline-block';
+        doneButton.style.display = 'none';
+        cancelButton.style.display = 'none';
+    }
+    inputs.forEach(function(input) {
+        input.disabled = !input.disabled;
+    });
+  }
+
+  // toggle a new row when adding a new record
+  function toggleNewRow() {
+    var newRow = document.getElementById('newRow');
+    var newButton = document.getElementById('newButton');
+    var cancelButton = document.getElementById('cancelButton');    
+    
+    newRow.style.display = newRow.style.display === 'none' ? 'table-row' : 'none';
+
+    if (newButton.style.display !== 'none') {
+        newButton.style.display = 'none';
+        cancelButton.style.display = 'inline-block';
+    } else {
+        newButton.style.display = 'inline-block';
+        cancelButton.style.display = 'none';
+    }
+
+    if (newButton.textContent === 'New') {
+        newButton.textContent = 'Undo';
+    } else {
+        newButton.textContent = 'New';
+    }
+  }
+
+  // input validation for a new input record
+  function validateAndSubmitNewShippingMethod() {
+
+    var newShippingName = document.getElementById('new_shipping_name').value.trim();
+    var newShippingPrice = document.getElementById('new_shipping_price').value.trim();
+
+    if (!newShippingName || !newShippingPrice) {
+        alert('Please complete all fields');
+        return;
+    }
+
+    // Check for special characters in Shipping Name
+    var shippingNameTest = /^[a-zA-Z0-9 ]+$/;
+    if (!shippingNameTest.test(newShippingName)) {
+        alert('Shipping Method cannot contain special characters!');
+        return;
+    }
+
+    // Check if Shipping Price is a number greater than 0
+    var shippingPriceTest = parseFloat(newShippingPrice);
+    if (isNaN(shippingPriceTest) || shippingPriceTest <= 0) {
+        alert('Shipping Price must be a number greater than 0.');
+        return;
+    }
+
+    var existingRows = document.querySelectorAll('#myTable tbody tr');
+    for (var i = 0; i < existingRows.length; i++) {
+        if (existingRows[i].id === 'newRow') continue; // Skip the new row
+
+        var existingShippingName = existingRows[i].querySelector('input[name^="shipping_name_"]').value.trim();
+        var existingShippingPrice = existingRows[i].querySelector('input[name^="shipping_price_"]').value.trim();
+
+        // Check if shipping name and shipping price match
+        if (newShippingName === existingShippingName && newShippingPrice === existingShippingPrice) {
+                alert('This shipping method already exists.');
+                return;
+        }
+    }
+    // Create a hidden form
+    var form = document.createElement('form');
+    form.style.display = 'none'; // Hide the form
+
+    // Set form attributes
+    form.method = 'POST';
+    form.action = '{{ url_for('admin.admin_shippingPriceManagement') }}';
+
+  // Create form fields and append them to the form
+  function createAndAppendInput(name, value) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+  }
+    createAndAppendInput('new_shipping_name', newShippingName);
+    createAndAppendInput('new_shipping_price', newShippingPrice);
+
+    // Append the form to the document body
+    document.body.appendChild(form);
+    // Submit the form
+    form.submit();
+  }
+
+    // input validation for a editted input record
+  function validateAndSubmitShippingMethod(shippingMethodId) {
+    var ShippingName = document.getElementById('shipping_name_' + shippingMethodId).value.trim();
+    var ShippingPrice = document.getElementById('shipping_price_' + shippingMethodId).value.trim();
+
+    if (!ShippingName || !ShippingPrice) {
+        alert('Please complete all fields');
+        return;
+    }
+
+    // Check for special characters in Shipping Name
+    var shippingNameTest = /^[a-zA-Z0-9 ]+$/;
+    if (!shippingNameTest.test(ShippingName)) {
+        alert('Shipping Method cannot contain special characters!');
+        return;
+    }
+
+    // Check if Shipping Price is a number greater than 0
+    var shippingPriceTest = parseFloat(ShippingPrice);
+    if (isNaN(shippingPriceTest) || shippingPriceTest <= 0) {
+        alert('Shipping Price must be a number greater than 0.');
+        return;
+    }
+
+    var existingRows = document.querySelectorAll('#myTable tbody tr');
+    for (var i = 0; i < existingRows.length; i++) {
+        if (existingRows[i].id === 'newRow') continue; // Skip the new row
+        var existingShippingMethodId = existingRows[i].querySelector('input[name="shipping_method_id"]').value;
+        if (existingShippingMethodId === shippingMethodId) continue; // Skip the current edited row
+
+    var existingShippingName = existingRows[i].querySelector('input[name^="shipping_name_"]').value.trim();
+    var existingShippingPrice = existingRows[i].querySelector('input[name^="shipping_price_"]').value.trim();
+
+    // Check if shipping name and shipping price match
+    if (ShippingName === existingShippingName && ShippingPrice === existingShippingPrice) {
+            alert('This shipping method already exists.');
+            return;
+    }
+    }
+    
+
+    // Create a hidden form
+    var form = document.createElement('form');
+    form.style.display = 'none'; // Hide the form
+
+    // Set form attributes
+    form.method = 'POST';
+    form.action = '{{ url_for('admin.admin_shippingPriceManagement') }}';
+
+    // Create form fields and append them to the form
+    function createAndAppendInput(name, value) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+
+    createAndAppendInput('shipping_method_id', shippingMethodId);
+    createAndAppendInput('shipping_name', ShippingName);
+    createAndAppendInput('shipping_price', ShippingPrice);
+
+    // Append the form to the document body
+    document.body.appendChild(form);  
+    // Submit the form
+    form.submit();
+  } 
+
+    // delete selected record
+    function deleteSelected(shippingMethodId) {
+
+        var deleteForm = document.getElementById('deleteForm');
+        var selectedIdsInput = document.getElementById('selectedIds');
+        selectedIdsInput.value = shippingMethodId;
+        deleteForm.submit();
+    }
+
+    // confirm deletion
+    function confirmDeleteHandler(shippingMethodId) {
+    var confirmDelete = confirm("Are you sure you want to delete the selected shipping methods?");
+    if (confirmDelete) {
+        deleteSelected(shippingMethodId);
+    }
+    }
+</script>
+{% endblock %}

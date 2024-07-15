@@ -1,0 +1,190 @@
+{% extends 'manager/manager_layout.html' %}
+{% block title %} Moa Creek Rural Supplies Manager {% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Manager Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('manager.manager_dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="col-lg-10">
+            <div class="row">
+                <!-- Products -->
+                <div class="col">
+                    <div class="card info-card customer-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Customers <span>| Total</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <a href="{{ url_for('manager.manager_users_management') }}">
+                                        <h6>{{ customer_count }}</h6>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Products -->
+
+                <!-- Orders -->
+                <div class="col">
+                    <div class="card info-card orders-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Orders <span>| This Month</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-cart-check"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <a href="{{ url_for('internal.orderManagement') }}">
+                                        <h6>{{this_month_order_count}}</h6>
+                                        <span class="text-success small pt-1 fw-bold">{{last_month_order_count}}</span> <span class="text-muted small pt-2 ps-1">Last Month</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Orders -->
+
+                <!-- Application -->
+                <div class="col">
+                    <div class="card info-card application-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Application <span>|New Application</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <a href="{{ url_for('internal.get_application_messages') }}">
+                                        <h6>{{new_application_count}}</h6>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Application -->
+
+                <!-- Inbox -->
+                <div class="col">
+                    <div class="card info-card inbox-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Inbox <span>| New Message</span></h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-envelope-exclamation"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <a href="{{ url_for('internal.get_messages_lv1') }}">
+                                        <h6>{{new_message_count}}</h6>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Inbox -->
+            </div>
+
+            <div class="row">
+                <!-- Track Payment Management -->
+                <div class="col-lg-8">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h5 class="card-title">Track Payment <span>| Current</span></h5>
+                            <table class="table table-borderless datatable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Customer Name</th>
+                                        <th scope="col">Unpaid Order Numbers</th>
+                                        <th scope="col">Total Unpaid Amount</th>
+                                        <th scope="col">Total Overdue Amount</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in payments %}
+                                    <tr>
+                                        <td>{{ p.first_name }} {{ p.last_name }}</td>
+                                        <td>{{ p.overdue_orders_count }}</td>
+                                        <td>${{ p.total_amount }}</td>
+                                        <td style="color: red;">${{ p.overdue_total_amount }}</td>
+                                        <td>
+                                            <form action="{{ url_for('manager.manager_dashboard') }}" method="post" onsubmit="submitForm(event)">
+                                                <input type="hidden" name="user_id" id="user_id" value="{{ p.user_id }}">
+                                                <button type="submit" class="btn btn-primary">Send Reminders</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div><!-- End Track Payment Management -->
+
+                <!-- Product Sales Popularity -->
+                <div class="col-lg-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">Product Sales Popularity <span>| Current</span></h5>
+                            <div id="productSalesChart" style="min-height: 400px;" class="echart"></div>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    const data = {{ product_sales_data | tojson | safe }};
+                                    const option = {
+                                        tooltip: {
+                                            trigger: 'item'
+                                        },
+                                        legend: {
+                                            top: '5%',
+                                            left: 'center',
+                                            type: 'scroll'
+                                        },
+                                        series: [{
+                                            name: 'Product Sales Popularity',
+                                            type: 'pie',
+                                            radius: ['40%', '70%'],
+                                            avoidLabelOverlap: false,
+                                            label: {
+                                                show: false,
+                                                position: 'center'
+                                            },
+                                            emphasis: {
+                                                label: {
+                                                    show: true,
+                                                    fontSize: '18',
+                                                    fontWeight: 'bold'
+                                                }
+                                            },
+                                            labelLine: {
+                                                show: false
+                                            },
+                                            data: data.map(item => ({
+                                                value: item.sales,
+                                                name: item.product_name
+                                            }))
+                                        }]
+                                    };
+
+                                    echarts.init(document.querySelector("#productSalesChart")).setOption(option);
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div><!-- End Product Sales Popularity -->
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+
+{% endblock %}

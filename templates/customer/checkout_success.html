@@ -1,0 +1,24 @@
+{% extends 'customer/customer_layout.html' %} 
+{% block title %} Moa Creek Rural Supplies Customer {% endblock %}
+{% block content %}
+<section class="product-area shop-sidebar shop section">
+	<div class="container">
+		<div class="row">
+			<div class="col text-center">
+				<h4 class="text-center mb-5">Order Placed</h4>
+				<a class="btn text-white" href="{{url_for('customer.customer_dashboard')}}">Click here to return to home</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+	{% block js %} 
+	<!-- Fancybox JS -->
+	<script src="{{ url_for('static', filename='customer/js/facnybox.min.js') }}"></script>
+	<!-- Ytplayer JS -->
+	<script src="{{ url_for('static', filename='customer/js/ytplayer.min.js') }}"></script>
+
+	{% endblock%}
+	
+{% endblock %}
+

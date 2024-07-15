@@ -1,0 +1,251 @@
+{% extends 'customer/customer_layout.html' %}
+{% block title %}
+Moa Creek Rural Supplies - Product Details
+{% endblock %}
+
+{% block content %}
+{% block css %}
+    <link href="{{ url_for('static', filename='customer/css/product_details.css') }}" rel="stylesheet">
+{% endblock %}
+
+  
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="bread-inner">
+                        <ul class="bread-list">
+                            <li><a href="{{ url_for('common.home') }}">Home<i class="ti-arrow-right"></i></a></li>
+                            <li><a href="{{ url_for('customer.all_products') }}">Products<i class="ti-arrow-right"></i></a></li>
+                            <li class="active">{{ product.product_name }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="product-details row">
+                        <div class="col-sm-5">
+                            <div id="main-product-image">
+                                {% if product.product_image_id %}
+                                    {% for image in products_images %}
+                                        {% if product.product_image_id == image.product_image_id %}
+                                            <div class="view-product">
+                                                <img id="main-image" src="/blueprints/static/product_image/{{ image.product_image }}" alt="" />
+                                                {% if discountedPrice %}
+                                                <span class="special-icon">Special</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="view-product">
+                                        <img id="main-image" src="/blueprints/static/product_image/default-image.jpg" alt="Product" />
+                                    </div>
+                                {% endif %}
+                            </div>
+                        
+                            <div id="similar-product" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="item">
+                                        <div class="d-flex justify-content-center">
+                                            {% for image in products_images %}
+                                            <div class="p-2">
+                                                <img class="thumbnail-image" src="/blueprints/static/product_image/{{ image.product_image }}" alt="">
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <a class="carousel-control-prev" href="#similar-product" role="button" data-bs-slide="prev">
+                                    <i class="fa fa-angle-left"></i>
+                                </a>
+                                <a class="carousel-control-next" href="#similar-product" role="button" data-bs-slide="next">
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                                
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="product-information">
+                                <h1>{{ product.product_name }}</h1>
+                                <span>
+                                    {% if discountedPrice == "buyOneGetOneFree" %}
+                                    <div class="row">
+                                    <span class="text-decoration-line-through">${{product.product_price}}NZD</span>
+                                    <span><h3 class="text-danger">Buy One Get One FREE!</h3></span>
+                                    </div>
+                                    {% elif discountedPrice%}
+                                    <span class="text-decoration-line-through">${{product.product_price}}NZD</span>
+                                    <h3 class="text-danger">${{discountedPrice}}NZD</h3>
+                                    {% else %}
+                                    <span>${{product.product_price}}NZD</span>
+                                    {% endif %}
+                                    <p style="color: red;">* product prices are GST inclusive </p>
+                                    <label>Quantity: </label>
+                                    <input type="text" id="qty-input" value="1" />
+                                    {% if session['user_type'] == 'customer' %}
+                                    <button type="button" class="btn btn-default cart" onclick="addToCart('{{product.product_name}}', {{product.product_id}}, document.getElementById('qty-input').value)">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        Add to cart
+                                    </button>
+
+                                    {% else %}
+                                    <button class="btn btn-danger cart" onclick="login()">
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        Please login first!
+                                    </button>  
+
+                                    {% endif %}
+                                </span>
+                                {% if product.stock_quantity > 0 %}
+                                    <p><b>Availability:</b> In Stock</p>
+                                {% elif product.stock_quantity == 0 %}
+                                    <p><b>Availability:</b> <span style="color: red;">Out of Stock</span></p>
+                                {% endif %}
+
+                                <p><span style="color: red;">{%if product.oversized ==1 %}Oversized{% elif  product.oversized ==2 %}Must Pick-up{% endif %}</span></p>
+                                <br>
+                                {% for p in applied_promotions %}
+                              
+                                    <p><strong>{% if (product.product_price * (1 - p.discount_rate)) | round(2) == discountedPrice%}Applied{%else%}Other{%endif%} Promotion:</strong> <span style="color: red;">{{ p.promotion_name }}</span></p>
+                                    {% set discount = p.discount_rate | float * 100 %}
+                                    <p><strong>Discount Rate:</strong> <span style="color: red;">{{ discount | int }}% off</span></p>
+                                    {% if p.special_condition %}
+                                        <p><strong>Special Condition:</strong> <span style="color: red;">{{ p.special_condition }}</span></p>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-tab shop-details-tab">
+                        <div class="col-sm-12">
+                            <ul class="nav nav-tabs">
+                                <li style="margin-left: 5px; margin-right: 5px;"></li> 
+                                <li style="margin-right: 20px;"><a href="#details" data-bs-toggle="tab"> Details |</a></li>
+                                <li style="margin-left: 5px; margin-right: 5px;"></li> 
+                                <li><a href="#reviews" data-bs-toggle="tab">Reviews</a></li>
+                            </ul>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active show" id="details">
+                                <div class="col-sm-12">
+                                    <div class="single-products">
+                                        <div class="productinfo text-center">
+                                            <p style="text-align: left; font-size: 16px; line-height: 1.6; margin: 20px;">{{ product.product_description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade active in" id="reviews" >
+								<div class="col-sm-12">
+                                    <div class="box">
+                                        {% if reviews %}
+                                            {% for i in reviews %}
+                                                <ul>    
+                                                    <li style="width: 80px;"><i class="fa fa-user"></i>{{ i.first_name[0] + '*****' }} </a></li>           
+                                                    <li style="width: 100px;"><i class="fa fa-calendar-o"></i> {{ i.review_date|nzdate }}</a></li>
+                                                    <li>
+                                                        {% for star in range(i.rating_value) %}
+                                                            <i class="fa fa-star" style="color: gold;"></i>
+                                                        {% endfor %}
+                                                        {% for empty_star in range(5 - i.rating_value) %}
+                                                            <i class="fa fa-star-o" style="color: gold;"></i>
+                                                        {% endfor %}
+                                                    </li>
+                                                </ul>
+                                                {% if i.review_status == 1 %}
+                                            <p>{{ i.review_comment }}</p>  
+                                            {% else %}
+                                            <p>Review hidden due to violation of community rule.</p>  
+                                            {%endif%}
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>No reviews available.</p>
+                                        {% endif %}
+                                    </div>
+                                    <br>
+                                    {% if canleavereview %}
+                                        <p><b>Write Your Review</b></p>
+                                        <form method="POST" action="{{ url_for('customer.leave_review') }}">
+                                            <textarea name="content" required></textarea>
+                                            <i class="fa fa-star" style="color: gold;"></i><b>Rating: </b>
+                                            <input type="number" name="rating" min="1" max="5"  step="1"    value="5"  required>
+                                            <input type="hidden" name="product_id" value="{{product.product_id}}">
+                                            <button type="submit" class="btn btn-default pull-right">
+                                                Submit
+                                            </button>
+                                        </form>
+                                    {% endif %}
+								</div>
+							</div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const thumbnails = document.querySelectorAll('.thumbnail-image');
+            const mainImage = document.getElementById('main-image');
+            const carousel = new bootstrap.Carousel(document.getElementById('similar-product'), { interval: false });
+            let currentIndex = 0;
+    
+            thumbnails.forEach((thumbnail, index) => {
+                thumbnail.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateMainImage();
+                });
+            });
+    
+            function updateMainImage() {
+                const newSrc = thumbnails[currentIndex].getAttribute('src');
+                mainImage.setAttribute('src', newSrc);
+            }
+    
+            function showNextImage() {
+                currentIndex = (currentIndex + 1) % thumbnails.length;
+                updateMainImage();
+            }
+    
+            function showPreviousImage() {
+                currentIndex = (currentIndex - 1 + thumbnails.length) % thumbnails.length;
+                updateMainImage();
+            }
+    
+            document.querySelector('.carousel-control-prev').addEventListener('click', showPreviousImage);
+            document.querySelector('.carousel-control-next').addEventListener('click', showNextImage);
+        });
+
+        function login() {
+            fetch('{{ url_for('user.login') }}', {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to the login page
+                    window.location.href = '{{ url_for('user.login') }}';
+                } else {
+                    console.error('Error loading login page');
+                }
+            })
+            .catch(error => {
+                console.error('Network error:', error);
+            });
+        }
+
+
+    </script>
+    
+
+{% endblock %}

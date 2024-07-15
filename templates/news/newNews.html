@@ -1,0 +1,88 @@
+{% if session['user_type'] == 'manager' %}
+{% extends 'manager/manager_layout.html' %} 
+{% elif session['user_type'] == 'admin' %}
+{% extends 'admin/admin_layout.html' %} 
+{% endif %}
+{% block title %} Moa Creek Rural Supplies - New news{% endblock %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>New News</h1>
+      <nav>
+        <ol class="breadcrumb">
+          {% set homepath = session.user_type ~ "." ~ session.user_type ~ "_dashboard"%}
+          <li class="breadcrumb-item"><a href="{{ url_for(homepath) }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('manager.newsManagement')}}">News Management</a></li>
+          <li class="breadcrumb-item active">New News</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+        <div class="col-xl-12">
+          <form method="POST" enctype=multipart/form-data action="{{url_for('manager.addNews', role = 'manager')}}" >
+                <div class="card">
+                  <div class="card-body pt-3">
+
+                    <div class="row mb-3">
+                      <label for="news_subject" class="col-md-4 col-lg-3 col-form-label">Subject</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="news_subject" class="form-control" id="news_subject" rows="4" required></textarea>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="news_content" class="col-md-4 col-lg-3 col-form-label">Content</label>
+                      <div class="col-md-8 col-lg-9">
+                        <textarea name="news_content" class="form-control" id="news_content" rows="4" required></textarea>
+                      </div>
+                    </div>
+
+                    <!-- <div class="row mb-3">
+                      <label for="news_timestamp" class="col-md-4 col-lg-3 col-form-label">Time</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="news_timestamp" type="datetime-local" class="form-control" id="news_timestamp" required>
+                      </div>
+                    </div> -->
+
+                    <div class="row mb-3">
+                      <label for="uploadInputFile" class="col-md-4 col-lg-3 col-form-label">News Image</label>
+                      <div class="col-md-8 col-lg-9">
+                        <img class="img-fluid" src="#" alt="Image Preview" id="imagePreview" style="display:none; max-width: 20vw; max-height: 20vh;">
+                        <div class="pt-2 row">
+                            <input type="file" multiple name="uploadInputFile" id="uploadInputFile" class="col-md-6" onblur="getElementById('imagePreview').style.display = 'block';" required>
+                            <button class="btn btn-danger btn-sm col-md-1" title="Remove my news image" onclick="getElementById('uploadInputFile').value = '';"><i class="bi bi-trash"></i></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </div>
+                </div>
+          </form>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+<script>
+
+  uploadInputFile.onchange = evt => {
+  const [file] = uploadInputFile.files
+  if (file) {
+    imagePreview.src = URL.createObjectURL(file)
+  }
+}
+</script>
+
+{% endblock %}
+
+
+
+
+
